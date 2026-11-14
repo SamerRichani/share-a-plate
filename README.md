@@ -2,7 +2,7 @@
 
 ShareAPlate connects restaurants, bakeries, supermarkets, and other food businesses with charities and community members to redistribute surplus food. Donors publish offers, recipients reserve portions and collect them, and administrators moderate offers and reports.
 
-This roadmap is based on the **ShareAPlate Capstone Project Proposal** by Samer Richani, Alfred Haber, and Ziad Boutros. It covers backend development first; frontend implementation follows once the API is working.
+This roadmap is based on the **ShareAPlate Capstone Project Proposal** by Samer Richani, Alfred Haber, and Ziad Boutros. It covers the backend roadmap; the frontend is being built in a separate, incremental track and is documented below.
 
 ## How we will work
 
@@ -74,6 +74,50 @@ backend/
 ```
 
 Create folders when needed rather than generating empty abstractions in advance. Keep database credentials and signing secrets in a local, ignored environment file; document variable names in `backend/.env.example`.
+
+## Frontend setup
+
+The frontend uses React, Vite, and plain JavaScript. The current frontend scope is steps 1 and 2 of its nine-step implementation: establish the Vite application and shared UI foundation. Authentication and the later application workflows are not included yet.
+
+### Frontend structure
+
+```text
+frontend/
+  package.json
+  .env.example
+  vite.config.js
+  src/
+    main.jsx
+    app/
+      App.jsx
+    components/
+      SiteHeader.jsx
+      ui/                 # Reusable buttons, fields, alerts, and states
+    styles/
+      global.css          # Design tokens, layout, responsive rules, and UI styles
+```
+
+### Run the frontend
+
+From the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Vite serves the application at `http://localhost:5173`. Requests to `/api` are proxied to `http://localhost:5000` by default. To use another backend URL, copy `.env.example` to `.env` and set `API_PROXY_TARGET`; local `.env` files are ignored by Git.
+
+Useful checks from `frontend/`:
+
+```bash
+npm run build
+npm run lint
+npm run format:check
+```
+
+Use `npm run format` to format frontend source files. Keep `package-lock.json` in version control so dependency installs remain reproducible.
 
 ## 3. Database design baseline
 
