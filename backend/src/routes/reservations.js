@@ -4,6 +4,7 @@ const { validateId, listReservations, cancelReservation, confirmPickup } = requi
 
 router.use(authenticate);
 router.param('id', validateId);
+
 router.get('/mine', authorize('recipient'), listReservations);
 router.post('/:id/cancel', authorize('recipient'), cancelReservation);
 router.post('/:id/pickup', authorize('donor'), confirmPickup);

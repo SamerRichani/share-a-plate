@@ -106,7 +106,9 @@ async function changeOwnedOffer(req, res, change) {
     const result = await client.query('SELECT * FROM offers WHERE id = $1 FOR UPDATE', [req.params.id]);
     const offer = result.rows[0];
     if (!offer) fail(404, 'Offer not found.');
-    if (offer.donor_id !== req.user.id) fail(403, 'You can only change your own offers.');
+    if (offer.donor_id !== req.user.id && req.user.role !== 'administrator') {
+      fail(403, 'You can only change your own offers.');
+    }
     const updated = await change(client, offer);
     await client.query('COMMIT');
     res.json({ offer: updated });
@@ -151,4 +153,17 @@ async function removeOffer(req, res) {
   });
 }
 
-module.exports = { validateId, listOffers, getOffer, createOffer, updateOffer, removeOffer };
+async function moderateOffer(req, res) {
+  const { status } = req.body || {};
+  if (!['closed', 'removed'].includes(status) || Object.keys(req.body).some(key => key !== 'status')) {
+    fail(400, 'Provide status closed or removed only.');
+  }
+  if (status === 'removed') return removeOffer(req, res);
+  return changeOwnedOffer(req, res, async (client, offer) => {
+    if (offer.status === 'removed') fail(409, 'Removed offers cannot be reopened.');
+    const result = await client.query("UPDATE offers SET status = 'closed' WHERE id = $1 RETURNING *", [offer.id]);
+    return result.rows[0];
+  });
+}
+
+module.exports = { validateId, listOffers, getOffer, createOffer, updateOffer, removeOffer, moderateOffer };

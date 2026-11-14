@@ -59,11 +59,13 @@ function pagination(query) {
 async function listReservations(req, res) {
   const { page, limit } = pagination(req.query);
   const forOffer = req.params.id !== undefined;
+  
   if (forOffer) {
     const result = await pool.query('SELECT donor_id FROM offers WHERE id = $1', [req.params.id]);
     if (!result.rowCount) fail(404, 'Offer not found.');
     if (result.rows[0].donor_id !== req.user.id) fail(403, 'You can only view reservations for your own offers.');
   }
+
   const result = await pool.query(`SELECT r.*,
     CASE WHEN r.status = 'reserved' AND o.pickup_deadline <= now() THEN 'expired' ELSE r.status END AS status,
     o.title, o.location, o.pickup_start, o.pickup_deadline
