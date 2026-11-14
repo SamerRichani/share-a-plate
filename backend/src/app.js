@@ -5,6 +5,7 @@ const app = express();
 app.use(express.json({ limit: '100kb' }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/offers', require('./routes/offers'));
+app.use('/api/reservations', require('./routes/reservations'));
 
 app.use((error, req, res, next) => {
   if (error.type === 'entity.parse.failed') {
