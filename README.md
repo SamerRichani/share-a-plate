@@ -77,7 +77,7 @@ Create folders when needed rather than generating empty abstractions in advance.
 
 ## Frontend setup
 
-The frontend uses React, Vite, and plain JavaScript. The current frontend scope is steps 1 and 2 of its nine-step implementation: establish the Vite application and shared UI foundation. Authentication and the later application workflows are not included yet.
+The frontend uses React, Vite, and plain JavaScript. Steps 1–9 are implemented: shared UI and responsive layouts, bearer-token authentication and role-based routing, offer discovery and donor management, recipient reservations, pickup confirmation, reporting, and administrator moderation.
 
 ### Frontend structure
 
@@ -89,13 +89,36 @@ frontend/
   src/
     main.jsx
     app/
-      App.jsx
+      App.jsx               # Public pages and role-protected routes
+    context/
+      AuthContext.jsx       # In-memory login state and session expiry
+    services/
+      api.js                # Centralized JSON and bearer-token API client
+    pages/
+      LandingPage.jsx
+      LoginPage.jsx
+      RegisterPage.jsx
+      OffersPage.jsx
+      OfferDetailPage.jsx
+      MyOffersPage.jsx
+      OfferFormPage.jsx
+      MyReservationsPage.jsx
+      OfferReservationsPage.jsx
+      AdminPage.jsx
     components/
-      SiteHeader.jsx
-      ui/                 # Reusable buttons, fields, alerts, and states
+      SiteHeader.jsx        # Role-aware navigation
+      ui/                   # Reusable buttons, fields, alerts, and states
     styles/
-      global.css          # Design tokens, layout, responsive rules, and UI styles
+      global.css            # Design tokens, layout, responsive rules, and UI styles
 ```
+
+### Authentication and API integration
+
+The frontend sends the API’s one-hour JWT as a bearer token held **in memory only**. It is not written to local storage, session storage, or a cookie; reloading the page signs the user out. A `401` response clears the current session and prompts the user to sign in again. Public registration offers donor and recipient roles only; administrator accounts are created through the backend seed process.
+
+The interface uses the backend’s role restrictions and status transitions. Offer and reservation quantities, availability, collection windows, cancellation, and moderation are validated by the API; rejected changes are shown to the user rather than treated as successful. The API remains authoritative for concurrent reservations and pickup confirmation.
+
+Protected screens are available at `/offers`, `/my-offers`, `/my-reservations`, and `/admin`; role-specific screens redirect users who do not have the required role. The Vite proxy forwards `/api` requests to the configured backend without exposing database or JWT secrets to the browser.
 
 ### Run the frontend
 
@@ -108,6 +131,8 @@ npm run dev
 ```
 
 Vite serves the application at `http://localhost:5173`. Requests to `/api` are proxied to `http://localhost:5000` by default. To use another backend URL, copy `.env.example` to `.env` and set `API_PROXY_TARGET`; local `.env` files are ignored by Git.
+
+If port 5000 is already in use, run the backend on another port and point the frontend proxy at it. For example, use `PORT=5001 npm run dev` from `backend/`, then `API_PROXY_TARGET=http://localhost:5001 npm run dev` from `frontend/`.
 
 Useful checks from `frontend/`:
 
