@@ -10,7 +10,7 @@ All endpoints require `Authorization: Bearer <token>`.
 | `POST /api/reservations/:id/cancel` | Owning recipient | None |
 | `POST /api/reservations/:id/pickup` | Owning donor | `{ "pickup_code": "<code from reservation>" }` |
 
-Creation returns HTTP 201 with `{ message: "Reservation confirmed.", reservation }`. Cancellation and pickup return `{ reservation }`. The server generates a unique random 32-character pickup code. It is included only in responses available to the owning recipient or owning donor.
+Creation returns HTTP 201 with `{ message: "Reservation confirmed.", reservation }`. Cancellation and pickup return `{ reservation }`. The server generates a short random 6-character pickup code (e.g. `K7P2XM`, no look-alike characters such as 0/O or 1/I). Confirming pickup ignores upper/lower case. It is included only in responses available to the owning recipient or owning donor.
 
 Both lists accept `page` (default 1) and `limit` (default 20, maximum 100), returning `{ reservations, page, limit }`. Results include the offer title, location, and pickup window.
 

@@ -1,0 +1,12 @@
+{
+  "name": "shareaplate",
+  "private": true,
+  "description": "ShareAPlate: share surplus food with your community",
+  "scripts": {
+    "setup": "node backend/scripts/create-env.js && npm install --prefix backend && npm install --prefix frontend && npm run db:migrate --prefix backend && npm run db:seed --prefix backend",
+    "start": "node start.js",
+    "test": "npm test --prefix backend && npm test --prefix frontend",
+    "build": "npm install --prefix backend && npm install --prefix frontend --include=dev && npm run build --prefix frontend",
+    "start:prod": "npm run db:migrate --prefix backend && npm start --prefix backend"
+  }
+}

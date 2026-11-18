@@ -1,169 +1,233 @@
+// Food offers: list, view, create, edit, close and remove.
+
 const pool = require('../config/db');
+const { withTransaction } = require('../config/db');
+const httpError = require('../utils/httpError');
+const { allowOnlyFields, isPositiveInteger, parseTimestamp, readPagination } = require('../utils/validation');
 
-const fields = ['title', 'description', 'category', 'area', 'location', 'quantity', 'pickup_start', 'pickup_deadline'];
-const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
+// The only fields a donor may send when creating or editing an offer.
+const OFFER_FIELDS = ['title', 'description', 'category', 'area', 'location', 'quantity', 'pickup_start', 'pickup_deadline'];
 
-function timestamp(value) {
-  if (typeof value !== 'string' || !/T.*(Z|[+-]\d{2}:\d{2})$/i.test(value) || !Number.isFinite(Date.parse(value))) {
-    fail(400, 'Dates must be ISO timestamps with a timezone.');
-  }
-  return new Date(value);
-}
+// Checks every offer field and returns a cleaned copy (trimmed, lowercase area/category, real dates).
+function cleanOfferData(input) {
+  const offer = { ...input, description: input.description ?? '' };
 
-function validateBody(body, editing = false) {
-  if (!body || typeof body !== 'object' || Array.isArray(body) || !Object.keys(body).length ||
-      Object.keys(body).some(key => !fields.includes(key) && !(editing && key === 'status'))) {
-    fail(400, 'Provide supported offer fields only.');
-  }
-}
-
-function offerData(body) {
-  const data = { ...body, description: body.description ?? '' };
   for (const field of ['title', 'category', 'area', 'location', 'description']) {
-    if (typeof data[field] !== 'string' || data[field].length > (field === 'description' ? 2000 : 200) ||
-        (field !== 'description' && !data[field].trim())) fail(400, `Invalid ${field}.`);
-    data[field] = data[field].trim();
+    const value = offer[field];
+    const maxLength = field === 'description' ? 2000 : 200;
+    const mayBeEmpty = field === 'description';
+    if (typeof value !== 'string' || value.length > maxLength || (!mayBeEmpty && !value.trim())) {
+      httpError(400, `Invalid ${field}.`);
+    }
+    offer[field] = value.trim();
   }
-  data.area = data.area.toLowerCase();
-  data.category = data.category.toLowerCase();
-  if (!Number.isInteger(data.quantity) || data.quantity < 1 || data.quantity > 2147483647) {
-    fail(400, 'Quantity must be a positive integer.');
+
+  // Stored in lowercase so filters match "Bakery" and "bakery".
+  offer.area = offer.area.toLowerCase();
+  offer.category = offer.category.toLowerCase();
+
+  if (!isPositiveInteger(offer.quantity)) httpError(400, 'Quantity must be a positive integer.');
+
+  offer.pickup_start = parseTimestamp(offer.pickup_start);
+  offer.pickup_deadline = parseTimestamp(offer.pickup_deadline);
+  if (offer.pickup_start >= offer.pickup_deadline || offer.pickup_deadline <= new Date()) {
+    httpError(400, 'Pickup deadline must be in the future and after pickup start.');
   }
-  data.pickup_start = timestamp(data.pickup_start);
-  data.pickup_deadline = timestamp(data.pickup_deadline);
-  if (data.pickup_start >= data.pickup_deadline || data.pickup_deadline <= new Date()) {
-    fail(400, 'Pickup deadline must be in the future and after pickup start.');
-  }
-  return data;
+  return offer;
 }
 
-function validateId(req, res, next, id) {
-  if (!/^\d+$/.test(id) || Number(id) < 1 || Number(id) > 2147483647) {
-    return res.status(400).json({ error: 'Invalid offer ID.' });
-  }
-  next();
-}
-
+// GET /api/offers        → offers anyone can reserve (with optional filters)
+// GET /api/offers/mine   → the signed-in donor's own offers
 async function listOffers(req, res) {
-  const { area, category, pickup_from, pickup_to, page = '1', limit = '20' } = req.query;
+  const { page, limit, offset } = readPagination(req.query);
+  const onlyMine = req.path === '/mine';
 
-  if (![page, limit].every(value => typeof value === 'string' && /^\d+$/.test(value)) ||
-      Number(page) < 1 || Number(page) > 1000000 || Number(limit) < 1 || Number(limit) > 100) {
-    fail(400, 'Use page 1–1000000 and limit 1–100.');
+  // We build the WHERE part step by step. Values always go in `values`
+  // (as $1, $2…), never glued into the SQL text, so SQL injection is impossible.
+  const conditions = [];
+  const values = [];
+
+  if (onlyMine) {
+    values.push(req.user.id);
+    conditions.push(`donor_id = $${values.length}`);
+  } else {
+    conditions.push("status = 'active'", 'remaining_quantity > 0', 'pickup_deadline > now()');
   }
 
-  const mine = req.path === '/mine';
-
-  const conditions = mine ? ['donor_id = $1'] : ["status = 'active'", 'remaining_quantity > 0', 'pickup_deadline > now()'];
-  const values = mine ? [req.user.id] : [];
-
-  for (const [field, value] of [['area', area], ['category', category]]) {
+  // Optional filters: ?area=riverside&category=bakery
+  for (const field of ['area', 'category']) {
+    const value = req.query[field];
     if (value === undefined) continue;
-    if (typeof value !== 'string' || !value.trim() || value.length > 200) fail(400, `Invalid ${field} filter.`);
+    if (typeof value !== 'string' || !value.trim() || value.length > 200) httpError(400, `Invalid ${field} filter.`);
     values.push(value.trim().toLowerCase());
-    conditions.push(`${field} = $${values.length}`);
+    conditions.push(`${field} = $${values.length}`); // `field` comes from our own list above, not the user
   }
 
-  const from = pickup_from === undefined ? null : timestamp(pickup_from);
-  const to = pickup_to === undefined ? null : timestamp(pickup_to);
+  // Optional time filters: ?pickup_from=...&pickup_to=...
+  const from = req.query.pickup_from === undefined ? null : parseTimestamp(req.query.pickup_from);
+  const to = req.query.pickup_to === undefined ? null : parseTimestamp(req.query.pickup_to);
+  if (from && to && from > to) httpError(400, 'Pickup filter start must precede its end.');
+  if (from) {
+    values.push(from);
+    conditions.push(`pickup_deadline >= $${values.length}`);
+  }
+  if (to) {
+    values.push(to);
+    conditions.push(`pickup_start <= $${values.length}`);
+  }
 
-  if (from && to && from > to) fail(400, 'Pickup filter start must precede its end.');
-  if (from) { values.push(from); conditions.push(`pickup_deadline >= $${values.length}`); }
-  if (to) { values.push(to); conditions.push(`pickup_start <= $${values.length}`); }
-
-  values.push(Number(limit), (Number(page) - 1) * Number(limit));
-  const result = await pool.query(`SELECT * FROM offers WHERE ${conditions.join(' AND ')}
-    ORDER BY created_at DESC, id DESC LIMIT $${values.length - 1} OFFSET $${values.length}`, values);
-  res.json({ offers: result.rows, page: Number(page), limit: Number(limit) });
+  values.push(limit, offset);
+  const result = await pool.query(
+    `SELECT * FROM offers
+     WHERE ${conditions.join(' AND ')}
+     ORDER BY created_at DESC, id DESC
+     LIMIT $${values.length - 1} OFFSET $${values.length}`,
+    values,
+  );
+  res.json({ offers: result.rows, page, limit });
 }
 
+// GET /api/offers/:id
+// You can see an offer if it's available, OR it's yours, OR you reserved it, OR you're an admin.
 async function getOffer(req, res) {
-  const result = await pool.query(`SELECT * FROM offers WHERE id = $1 AND (
-    (status = 'active' AND remaining_quantity > 0 AND pickup_deadline > now())
-    OR donor_id = $2 OR $3 = 'administrator'
-    OR EXISTS (SELECT 1 FROM reservations WHERE offer_id = offers.id AND recipient_id = $2)
-  )`, [req.params.id, req.user.id, req.user.role]);
-
-  if (!result.rowCount) fail(404, 'Offer not found or unavailable.');
+  const result = await pool.query(
+    `SELECT * FROM offers
+     WHERE id = $1 AND (
+       (status = 'active' AND remaining_quantity > 0 AND pickup_deadline > now())
+       OR donor_id = $2
+       OR $3 = 'administrator'
+       OR EXISTS (SELECT 1 FROM reservations WHERE offer_id = offers.id AND recipient_id = $2)
+     )`,
+    [req.params.id, req.user.id, req.user.role],
+  );
+  if (result.rowCount === 0) httpError(404, 'Offer not found or unavailable.');
   res.json({ offer: result.rows[0] });
 }
 
+// POST /api/offers  (donors only)
 async function createOffer(req, res) {
-  validateBody(req.body);
-  const data = offerData(req.body);
-  
-  const result = await pool.query(`INSERT INTO offers
-    (donor_id, title, description, category, area, location, quantity, pickup_start, pickup_deadline, remaining_quantity)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$7) RETURNING *`, [req.user.id, ...fields.map(field => data[field])]);
+  allowOnlyFields(req.body, OFFER_FIELDS, 'Provide supported offer fields only.');
+  const offer = cleanOfferData(req.body);
+
+  const result = await pool.query(
+    `INSERT INTO offers
+       (donor_id, title, description, category, area, location, quantity, pickup_start, pickup_deadline, remaining_quantity)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $7)
+     RETURNING *`,
+    [req.user.id, ...OFFER_FIELDS.map((field) => offer[field])],
+  );
   res.status(201).json({ offer: result.rows[0] });
 }
 
-// Lock the offer first; reservation operations must use the same lock order.
-async function changeOwnedOffer(req, res, change) {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
+// Shared by edit / remove / moderate:
+// 1. start a transaction, 2. lock the offer row (FOR UPDATE) so nobody else
+// changes it at the same time, 3. check it belongs to you (or you're admin),
+// 4. run the change, 5. reply with the updated offer.
+async function changeOffer(req, res, change) {
+  const updated = await withTransaction(async (client) => {
     const result = await client.query('SELECT * FROM offers WHERE id = $1 FOR UPDATE', [req.params.id]);
     const offer = result.rows[0];
-    if (!offer) fail(404, 'Offer not found.');
-    if (offer.donor_id !== req.user.id && req.user.role !== 'administrator') {
-      fail(403, 'You can only change your own offers.');
-    }
-    const updated = await change(client, offer);
-    await client.query('COMMIT');
-    res.json({ offer: updated });
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
+    if (!offer) httpError(404, 'Offer not found.');
+
+    // Stops "IDOR" attacks: changing the id in the URL to edit someone else's offer.
+    const isOwner = offer.donor_id === req.user.id;
+    const isAdmin = req.user.role === 'administrator';
+    if (!isOwner && !isAdmin) httpError(403, 'You can only change your own offers.');
+
+    return change(client, offer);
+  });
+  res.json({ offer: updated });
 }
 
+// PATCH /api/offers/:id  (donor edits their offer, or closes it with { status: 'closed' })
 async function updateOffer(req, res) {
-  validateBody(req.body, true);
-  return changeOwnedOffer(req, res, async (client, offer) => {
-    if (offer.status === 'removed' || offer.pickup_deadline <= new Date()) fail(409, 'Removed or expired offers cannot be edited.');
-    if (req.body.status !== undefined && req.body.status !== 'closed') fail(400, 'Only closing an offer is allowed through PATCH.');
-    const data = offerData({ ...offer, pickup_start: offer.pickup_start.toISOString(),
-      pickup_deadline: offer.pickup_deadline.toISOString(), ...req.body });
-    const committed = offer.quantity - offer.remaining_quantity;
-    if (data.quantity < committed) fail(409, 'Quantity cannot be lower than committed portions.');
-    if (committed > 0 && (data.location !== offer.location || data.area !== offer.area ||
-        +data.pickup_start !== +offer.pickup_start || +data.pickup_deadline !== +offer.pickup_deadline)) {
-      fail(409, 'Collection location and times cannot change after portions are committed.');
-    }
-    const result = await client.query(`UPDATE offers SET title=$1, description=$2, category=$3,
-      area=$4, location=$5, quantity=$6, pickup_start=$7, pickup_deadline=$8,
-      remaining_quantity=$9, status=$10 WHERE id=$11 RETURNING *`,
-    [...fields.map(field => data[field]), data.quantity - committed, req.body.status || offer.status, offer.id]);
-    return result.rows[0];
-  });
-}
-
-async function removeOffer(req, res) {
-  return changeOwnedOffer(req, res, async (client, offer) => {
-    if (offer.status === 'removed') return offer;
-    const cancelled = await client.query(`UPDATE reservations SET status = CASE WHEN $2 THEN 'expired' ELSE 'cancelled' END
-      WHERE offer_id = $1 AND status = 'reserved' RETURNING quantity, status`, [offer.id, offer.pickup_deadline <= new Date()]);
-    const restored = cancelled.rows.reduce((sum, row) => sum + (row.status === 'cancelled' ? row.quantity : 0), 0);
-    const result = await client.query(`UPDATE offers SET status = 'removed',
-      remaining_quantity = remaining_quantity + $1 WHERE id = $2 RETURNING *`, [restored, offer.id]);
-    return result.rows[0];
-  });
-}
-
-async function moderateOffer(req, res) {
-  const { status } = req.body || {};
-  if (!['closed', 'removed'].includes(status) || Object.keys(req.body).some(key => key !== 'status')) {
-    fail(400, 'Provide status closed or removed only.');
+  allowOnlyFields(req.body, [...OFFER_FIELDS, 'status'], 'Provide supported offer fields only.');
+  if (Object.keys(req.body).length === 0) httpError(400, 'Provide supported offer fields only.');
+  if (req.body.status !== undefined && req.body.status !== 'closed') {
+    httpError(400, 'Only closing an offer is allowed through PATCH.');
   }
+
+  return changeOffer(req, res, async (client, current) => {
+    if (current.status === 'removed' || current.pickup_deadline <= new Date()) {
+      httpError(409, 'Removed or expired offers cannot be edited.');
+    }
+
+    // Start from the current offer and apply the changes that were sent.
+    const { status, ...changes } = req.body;
+    const offer = cleanOfferData({
+      ...current,
+      pickup_start: current.pickup_start.toISOString(),
+      pickup_deadline: current.pickup_deadline.toISOString(),
+      ...changes,
+    });
+
+    // Portions already promised to people (reserved or collected).
+    const committed = current.quantity - current.remaining_quantity;
+    if (offer.quantity < committed) httpError(409, 'Quantity cannot be lower than committed portions.');
+
+    // Don't move the pickup place/time once someone has reserved.
+    const pickupChanged = offer.location !== current.location || offer.area !== current.area ||
+      +offer.pickup_start !== +current.pickup_start || +offer.pickup_deadline !== +current.pickup_deadline;
+    if (committed > 0 && pickupChanged) {
+      httpError(409, 'Collection location and times cannot change after portions are committed.');
+    }
+
+    const result = await client.query(
+      `UPDATE offers
+       SET title = $1, description = $2, category = $3, area = $4, location = $5,
+           quantity = $6, pickup_start = $7, pickup_deadline = $8,
+           remaining_quantity = $9, status = $10
+       WHERE id = $11
+       RETURNING *`,
+      [...OFFER_FIELDS.map((field) => offer[field]), offer.quantity - committed, status || current.status, current.id],
+    );
+    return result.rows[0];
+  });
+}
+
+// DELETE /api/offers/:id  (also used by admins)
+// The offer is marked "removed" (not deleted) so its history is kept.
+// Pending reservations are cancelled and their portions given back.
+async function removeOffer(req, res) {
+  return changeOffer(req, res, async (client, offer) => {
+    if (offer.status === 'removed') return offer;
+
+    const isPastDeadline = offer.pickup_deadline <= new Date();
+    const cancelled = await client.query(
+      `UPDATE reservations
+       SET status = CASE WHEN $2 THEN 'expired' ELSE 'cancelled' END
+       WHERE offer_id = $1 AND status = 'reserved'
+       RETURNING quantity, status`,
+      [offer.id, isPastDeadline],
+    );
+
+    let portionsBack = 0;
+    for (const row of cancelled.rows) {
+      if (row.status === 'cancelled') portionsBack += row.quantity;
+    }
+
+    const result = await client.query(
+      `UPDATE offers SET status = 'removed', remaining_quantity = remaining_quantity + $1
+       WHERE id = $2 RETURNING *`,
+      [portionsBack, offer.id],
+    );
+    return result.rows[0];
+  });
+}
+
+// PATCH /api/admin/offers/:id  (admins only) with { status: 'closed' } or { status: 'removed' }
+async function moderateOffer(req, res) {
+  allowOnlyFields(req.body, ['status'], 'Provide status closed or removed only.');
+  const { status } = req.body;
+  if (!['closed', 'removed'].includes(status)) httpError(400, 'Provide status closed or removed only.');
+
   if (status === 'removed') return removeOffer(req, res);
-  return changeOwnedOffer(req, res, async (client, offer) => {
-    if (offer.status === 'removed') fail(409, 'Removed offers cannot be reopened.');
+
+  return changeOffer(req, res, async (client, offer) => {
+    if (offer.status === 'removed') httpError(409, 'Removed offers cannot be reopened.');
     const result = await client.query("UPDATE offers SET status = 'closed' WHERE id = $1 RETURNING *", [offer.id]);
     return result.rows[0];
   });
 }
 
-module.exports = { validateId, listOffers, getOffer, createOffer, updateOffer, removeOffer, moderateOffer };
+module.exports = { listOffers, getOffer, createOffer, updateOffer, removeOffer, moderateOffer };

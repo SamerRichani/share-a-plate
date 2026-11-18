@@ -130,15 +130,14 @@ function OfferReservationsPage() {
                       className="field__input pickup-code-input"
                       id={`pickup-code-${reservation.id}`}
                       maxLength="32"
-                      minLength="32"
-                      pattern="[a-f0-9]{32}"
-                      placeholder="32-character code"
+                      minLength="6"
+                      placeholder="e.g. K7P2XM"
                       required
                       value={codes[reservation.id] || ''}
                       onChange={(event) =>
                         setCodes((current) => ({
                           ...current,
-                          [reservation.id]: event.target.value.toLowerCase(),
+                          [reservation.id]: event.target.value.toUpperCase(),
                         }))
                       }
                     />

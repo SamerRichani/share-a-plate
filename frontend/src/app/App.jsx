@@ -14,6 +14,13 @@ import SiteHeader from '../components/SiteHeader';
 import Alert from '../components/ui/Alert';
 import { useAuth } from '../hooks/useAuth';
 
+// The list of pages (client-side routing with React Router).
+//
+// These two "guards" only improve the user experience: they hide pages you
+// can't use. The real security check happens on the server, which verifies
+// the login token and role on EVERY request.
+
+// Pages inside <RequireAuth> need you to be signed in; otherwise → /login.
 function RequireAuth() {
   const { user } = useAuth();
   const location = useLocation();
@@ -24,6 +31,7 @@ function RequireAuth() {
   return <Outlet />;
 }
 
+// Pages wrapped in <RoleRoute role="donor"> are only for that role.
 function RoleRoute({ children, role }) {
   const { user } = useAuth();
   if (!user) return <Navigate replace to="/login" />;

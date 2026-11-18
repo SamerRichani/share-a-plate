@@ -53,6 +53,6 @@ npm run db:seed
 
 Choose distinct emails and set a password for each account. Passwords must be at least 12 characters and at most 72 UTF-8 bytes (bcrypt's limit). Re-running synchronizes each account's password hash with the value in the ignored environment file, but never changes its role. It errors if a configured email already belongs to a different role. Store the passwords in the ignored environment file, not in the tracked example file.
 
-The seed also creates five sample offers for the demo donor with future pickup windows. The offers are labeled as previews, use example pickup locations, and are not real food availability. Re-running the seed does not duplicate existing demo offers. If the previous seed created `community-kitchen@demo.invalid`, its demo offers are moved to the configured demo donor.
+The seed also creates five sample offers for the demo donor. Their pickup windows are already open (they start one hour before seeding and last 2–7 days); re-running the seed refreshes those times. The offers are labeled as previews, use example pickup locations, and are not real food availability. Re-running the seed does not duplicate existing demo offers. If the previous seed created `community-kitchen@demo.invalid`, its demo offers are moved to the configured demo donor.
 
 SQL schema: [001_initial_schema.sql](migrations/001_initial_schema.sql). Commands: [migrate.js](migrate.js) and [seed.js](seed.js).

@@ -9,7 +9,13 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       strictPort: true,
-      proxy: { '/api': env.API_PROXY_TARGET || 'http://localhost:5000' },
+      // During development, requests to /api go to the backend server.
+      proxy: { '/api': env.API_PROXY_TARGET || 'http://localhost:5001' },
+    },
+    // Settings for `npm test` (Vitest).
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/tests/setup.js',
     },
   };
 });

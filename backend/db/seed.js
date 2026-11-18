@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt');
 const pool = require('../src/config/db');
 
 const LEGACY_DEMO_DONOR_EMAIL = 'community-kitchen@demo.invalid';
+// Demo offers. Pickup opens 1 hour before seeding (so a pickup can be confirmed
+// straight away in a demo) and stays open for a few days.
+// Re-running `npm run db:seed` refreshes these times.
 const demoOffers = [
   {
     title: 'Fresh sourdough loaves',
@@ -12,8 +15,8 @@ const demoOffers = [
     area: 'old town',
     location: 'Demo pickup: Old Town Community Kitchen',
     quantity: 8,
-    pickupStartHours: 1,
-    pickupDeadlineHours: 8,
+    pickupStartHours: -1,
+    pickupDeadlineHours: 72,
   },
   {
     title: 'Seasonal produce boxes',
@@ -22,8 +25,8 @@ const demoOffers = [
     area: 'riverside',
     location: 'Demo pickup: Riverside Community Pantry',
     quantity: 6,
-    pickupStartHours: 3,
-    pickupDeadlineHours: 27,
+    pickupStartHours: -1,
+    pickupDeadlineHours: 96,
   },
   {
     title: 'Vegetarian lunch bowls',
@@ -32,8 +35,8 @@ const demoOffers = [
     area: 'market district',
     location: 'Demo pickup: Market District Cafe',
     quantity: 5,
-    pickupStartHours: 1,
-    pickupDeadlineHours: 6,
+    pickupStartHours: -1,
+    pickupDeadlineHours: 48,
   },
   {
     title: 'Mixed pastry box',
@@ -42,8 +45,8 @@ const demoOffers = [
     area: 'north end',
     location: 'Demo pickup: North End Bakehouse',
     quantity: 4,
-    pickupStartHours: 2,
-    pickupDeadlineHours: 12,
+    pickupStartHours: -1,
+    pickupDeadlineHours: 120,
   },
   {
     title: 'Apples, oranges, and pantry staples',
@@ -52,8 +55,8 @@ const demoOffers = [
     area: 'garden quarter',
     location: 'Demo pickup: Garden Quarter Food Hub',
     quantity: 7,
-    pickupStartHours: 5,
-    pickupDeadlineHours: 48,
+    pickupStartHours: -1,
+    pickupDeadlineHours: 168,
   },
 ];
 
@@ -117,9 +120,20 @@ async function seedDemoOffers(donorId) {
     `, [donorId, offer.title, offer.description, offer.category, offer.area,
       offer.location, offer.quantity, offer.pickupStartHours, offer.pickupDeadlineHours]);
     createdOffers += result.rowCount;
+
+    // If the demo offer already existed, give it fresh pickup times so it is
+    // available again (e.g. re-seed on the morning of a presentation).
+    if (!result.rowCount) {
+      await pool.query(`
+        UPDATE offers
+        SET pickup_start = now() + ($3::integer * interval '1 hour'),
+            pickup_deadline = now() + ($4::integer * interval '1 hour')
+        WHERE donor_id = $1 AND title = $2 AND status = 'active'
+      `, [donorId, offer.title, offer.pickupStartHours, offer.pickupDeadlineHours]);
+    }
   }
 
-  console.log(`${createdOffers} demo offer${createdOffers === 1 ? '' : 's'} added.`);
+  console.log(`${createdOffers} demo offer${createdOffers === 1 ? '' : 's'} added; pickup times refreshed.`);
 }
 
 async function seed() {

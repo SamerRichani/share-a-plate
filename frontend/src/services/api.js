@@ -1,4 +1,19 @@
-let accessToken = null;
+// Every call from the website to the server goes through this file.
+// It adds the login token to each request and turns errors into messages.
+//
+// The login token is kept in sessionStorage so that refreshing the page
+// does not log the user out. It is cleared when the browser tab is closed.
+const TOKEN_KEY = 'shareaplate:token';
+
+function readStoredToken() {
+  try {
+    return sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+let accessToken = readStoredToken();
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -8,8 +23,18 @@ export class ApiError extends Error {
   }
 }
 
+export function getAccessToken() {
+  return accessToken;
+}
+
 export function setAccessToken(token) {
   accessToken = token;
+  try {
+    if (token) sessionStorage.setItem(TOKEN_KEY, token);
+    else sessionStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Storage can be blocked (e.g. private mode); the app still works in memory.
+  }
 }
 
 export async function request(path, { body, headers, ...options } = {}) {
@@ -44,7 +69,7 @@ export async function request(path, { body, headers, ...options } = {}) {
 
   if (!response.ok) {
     if (response.status === 401 && accessToken) {
-      accessToken = null;
+      setAccessToken(null);
       window.dispatchEvent(new Event('shareaplate:session-expired'));
     }
     throw new ApiError(

@@ -4,7 +4,11 @@ import { useAuth } from '../hooks/useAuth';
 import Button from '../components/ui/Button';
 import TextField from '../components/ui/TextField';
 
-// Local demo accounts created by `npm run db:seed` (see backend/.env.example and README).
+// Local demo accounts created by `npm run db:seed` (see backend/.env.example).
+// These shortcut buttons only appear while developing on our own computer
+// (`npm start`). They are left out of the public website build, so nobody
+// visiting the live site gets a one-click admin login.
+const SHOW_DEMO_ACCOUNTS = import.meta.env.DEV;
 const DEMO_ACCOUNTS = [
   { label: 'Admin', email: 'admin@example.test', password: 'admin123@123' },
   { label: 'Donor', email: 'donor@example.test', password: 'donor123@123' },
@@ -87,22 +91,28 @@ function LoginPage() {
             {submitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
-        <div className="stack-form" aria-label="Demo accounts">
-          <p className="auth-card__intro">Or fill in a demo account:</p>
-          {DEMO_ACCOUNTS.map((account) => (
-            <Button
-              className="button--wide"
-              key={account.email}
-              type="button"
-              variant="secondary"
-              onClick={() =>
-                setValues({ email: account.email, password: account.password })
-              }
-            >
-              {account.label} demo
-            </Button>
-          ))}
-        </div>
+        {SHOW_DEMO_ACCOUNTS && (
+          <div className="demo-accounts" aria-label="Demo accounts">
+            <p>Demo accounts (local only)</p>
+            <div className="demo-accounts__buttons">
+              {DEMO_ACCOUNTS.map((account) => (
+                <Button
+                  key={account.email}
+                  type="button"
+                  variant="secondary"
+                  onClick={() =>
+                    setValues({
+                      email: account.email,
+                      password: account.password,
+                    })
+                  }
+                >
+                  {account.label} demo
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
         <p className="auth-card__switch">
           New around here? <Link to="/register">Create an account</Link>
         </p>

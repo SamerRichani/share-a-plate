@@ -1,49 +1,65 @@
+// Administrator pages: see all reports and all offers, and resolve reports.
+// (Removing/closing an offer is moderateOffer in offers.js.)
+
 const pool = require('../config/db');
+const httpError = require('../utils/httpError');
+const { allowOnlyFields, readPagination } = require('../utils/validation');
 
-function validateId(req, res, next, id) {
-  if (!/^\d+$/.test(id) || Number(id) < 1 || Number(id) > 2147483647) {
-    return res.status(400).json({ error: 'Invalid ID.' });
-  }
-  next();
+const REPORT_STATUSES = ['open', 'resolved', 'dismissed'];
+const OFFER_STATUSES = ['active', 'closed', 'removed'];
+
+// GET /api/admin/reports?status=open
+async function listReports(req, res) {
+  const { status } = req.query;
+  if (status !== undefined && !REPORT_STATUSES.includes(status)) httpError(400, 'Use a valid status.');
+  const { page, limit, offset } = readPagination(req.query);
+
+  const result = await pool.query(
+    `SELECT * FROM reports
+     WHERE ($1::text IS NULL OR status = $1)
+     ORDER BY created_at DESC, id DESC
+     LIMIT $2 OFFSET $3`,
+    [status ?? null, limit, offset],
+  );
+  res.json({ reports: result.rows, page, limit });
 }
 
-// Table names are fixed by the controller functions below, never by user input.
-async function listRecords(req, res, table, statuses) {
-  const { status, page = '1', limit = '20' } = req.query;
-  if ((status !== undefined && !statuses.includes(status)) ||
-      ![page, limit].every(value => typeof value === 'string' && /^\d+$/.test(value)) ||
-      Number(page) < 1 || Number(page) > 1000000 || Number(limit) < 1 || Number(limit) > 100) {
-    return res.status(400).json({ error: 'Use a valid status, page 1–1000000, and limit 1–100.' });
-  }
-  const result = await pool.query(`SELECT * FROM ${table}
-    WHERE ($1::text IS NULL OR status = $1)
-    ORDER BY created_at DESC, id DESC LIMIT $2 OFFSET $3`,
-  [status ?? null, Number(limit), (Number(page) - 1) * Number(limit)]);
-  res.json({ [table]: result.rows, page: Number(page), limit: Number(limit) });
+// GET /api/admin/offers?status=active
+async function listOffers(req, res) {
+  const { status } = req.query;
+  if (status !== undefined && !OFFER_STATUSES.includes(status)) httpError(400, 'Use a valid status.');
+  const { page, limit, offset } = readPagination(req.query);
+
+  const result = await pool.query(
+    `SELECT * FROM offers
+     WHERE ($1::text IS NULL OR status = $1)
+     ORDER BY created_at DESC, id DESC
+     LIMIT $2 OFFSET $3`,
+    [status ?? null, limit, offset],
+  );
+  res.json({ offers: result.rows, page, limit });
 }
 
-function listReports(req, res) {
-  return listRecords(req, res, 'reports', ['open', 'resolved', 'dismissed']);
-}
-
-function listOffers(req, res) {
-  return listRecords(req, res, 'offers', ['active', 'closed', 'removed']);
-}
-
+// PATCH /api/admin/reports/:id with { status: 'resolved' } or { status: 'dismissed' }
 async function updateReport(req, res) {
-  const { status } = req.body || {};
-  if (!['resolved', 'dismissed'].includes(status) || Object.keys(req.body).some(key => key !== 'status')) {
-    return res.status(400).json({ error: 'Provide status resolved or dismissed only.' });
-  }
-  const result = await pool.query(`UPDATE reports SET status = $1
-    WHERE id = $2 AND (status = 'open' OR status = $1) RETURNING *`, [status, req.params.id]);
-  if (!result.rowCount) {
+  allowOnlyFields(req.body, ['status'], 'Provide status resolved or dismissed only.');
+  const { status } = req.body;
+  if (!['resolved', 'dismissed'].includes(status)) httpError(400, 'Provide status resolved or dismissed only.');
+
+  // Only an open report can be closed (a finished report stays finished).
+  const result = await pool.query(
+    `UPDATE reports SET status = $1
+     WHERE id = $2 AND (status = 'open' OR status = $1)
+     RETURNING *`,
+    [status, req.params.id],
+  );
+
+  if (result.rowCount === 0) {
     const exists = await pool.query('SELECT 1 FROM reports WHERE id = $1', [req.params.id]);
-    return res.status(exists.rowCount ? 409 : 404).json({
-      error: exists.rowCount ? 'A finalized report cannot change status.' : 'Report not found.',
-    });
+    if (exists.rowCount === 0) httpError(404, 'Report not found.');
+    httpError(409, 'A finalized report cannot change status.');
   }
   res.json({ report: result.rows[0] });
 }
 
-module.exports = { validateId, listReports, listOffers, updateReport };
+module.exports = { listReports, listOffers, updateReport };

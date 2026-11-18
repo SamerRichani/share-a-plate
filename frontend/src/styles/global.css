@@ -5,29 +5,30 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-  --font-body: 'Avenir Next', Avenir, 'Segoe UI', sans-serif;
+  /* Design tokens: change a colour here and it changes everywhere. */
+  --font-body: 'Inter Variable', 'Segoe UI', system-ui, sans-serif;
   --font-display:
-    'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
-  --color-ink: #30382d;
-  --color-muted: #666b60;
-  --color-green: #586b4b;
-  --color-green-dark: #3d4d39;
-  --color-green-soft: #e5e9df;
-  --color-cream: #f6f3eb;
-  --color-white: #fcfaf4;
-  --color-peach: #e8d8c8;
-  --color-gold: #c49a52;
-  --color-border: #ded9cc;
-  --color-danger: #8d4a3e;
-  --color-danger-soft: #f2e5df;
-  --color-success: #4b6348;
-  --color-success-soft: #e6ebe1;
-  --color-info: #596c63;
-  --color-info-soft: #e8ece7;
-  --color-warning: #735b30;
-  --color-warning-soft: #f1ead9;
+    'Bricolage Grotesque Variable', 'Avenir Next', 'Segoe UI', sans-serif;
+  --color-ink: #14231b; /* main text */
+  --color-muted: #4d5c52; /* secondary text */
+  --color-green: #1d6b45; /* brand / main buttons */
+  --color-green-dark: #134a30;
+  --color-green-soft: #e2f0e6;
+  --color-cream: #f4f7f1; /* page background */
+  --color-white: #ffffff; /* cards */
+  --color-peach: #ffe9d9;
+  --color-gold: #f29a2e; /* warm accent */
+  --color-border: #dbe3d8;
+  --color-danger: #a33a2b;
+  --color-danger-soft: #fbe7e3;
+  --color-success: #1d6b45;
+  --color-success-soft: #e2f0e6;
+  --color-info: #2f5d73;
+  --color-info-soft: #e3eff4;
+  --color-warning: #7a5410;
+  --color-warning-soft: #fdf1d8;
 
-  --shadow-card: 0 18px 48px rgb(48 56 45 / 10%);
+  --shadow-card: 0 1px 2px rgb(20 35 27 / 6%), 0 12px 32px rgb(20 35 27 / 8%);
   --radius-card: 1.25rem;
   --radius-pill: 999px;
 }
@@ -1532,6 +1533,345 @@ h3 {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ------------------------------------------------------------------
+   Design refresh: brighter colours, stronger contrast, livelier cards.
+   (Placed before the mobile rules below so those still win on phones.)
+   ------------------------------------------------------------------ */
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-bottom: 1px solid var(--color-border);
+  background: rgb(255 255 255 / 85%);
+  backdrop-filter: saturate(1.4) blur(12px);
+}
+
+.site-header__inner {
+  min-height: 72px;
+}
+
+.brand__name {
+  font-weight: 800;
+}
+
+.primary-nav a {
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-pill);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.primary-nav a:hover {
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.button {
+  font-weight: 700;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 25%) inset;
+}
+
+.button--primary {
+  box-shadow:
+    0 6px 16px rgb(29 107 69 / 25%),
+    0 1px 0 rgb(255 255 255 / 25%) inset;
+}
+
+.button--outline {
+  background: var(--color-white);
+}
+
+.button:disabled {
+  background: #e4e8e3;
+  color: #6b766e;
+  box-shadow: none;
+}
+
+.button:focus-visible,
+.field__input:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.eyebrow {
+  color: var(--color-green);
+  font-weight: 800;
+}
+
+.hero h1 em {
+  color: var(--color-green);
+}
+
+.steps-section {
+  background: var(--color-white);
+}
+
+.step-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-cream);
+  box-shadow: none;
+}
+
+.step-card__number {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.audience-card--green {
+  background: var(--color-green);
+  color: var(--color-white);
+}
+
+.audience-card--green h2,
+.audience-card--green .eyebrow,
+.audience-card--green .audience-card__description {
+  color: var(--color-white);
+}
+
+.audience-card--peach {
+  background: var(--color-peach);
+}
+
+.field__input {
+  border: 1.5px solid var(--color-border);
+  background: var(--color-white);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.field__input:hover {
+  border-color: #b9c6b6;
+}
+
+.field__input:focus {
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 4px rgb(29 107 69 / 14%);
+}
+
+.auth-card,
+.form-card {
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.demo-accounts {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-cream);
+}
+
+.demo-accounts p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.demo-accounts__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.demo-accounts__buttons .button {
+  min-height: 38px;
+  flex: 1 1 auto;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.page-heading h1 {
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+}
+
+.filter-panel {
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+.offer-grid {
+  gap: 1.25rem;
+}
+
+.offer-card,
+.offer-managed {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.offer-card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, var(--color-green), var(--color-gold));
+  content: '';
+}
+
+.offer-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgb(20 35 27 / 6%),
+    0 20px 40px rgb(20 35 27 / 12%);
+}
+
+.offer-card__category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-green-dark);
+}
+
+.offer-card__icon {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--color-green-soft);
+  font-size: 1.1rem;
+  letter-spacing: 0;
+}
+
+.offer-card h2 {
+  font-size: 1.4rem;
+}
+
+.offer-card h2 a {
+  color: var(--color-ink);
+}
+
+.offer-card__portions {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.25rem 0 1rem;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+}
+
+.offer-card__portions strong {
+  color: var(--color-ink);
+  font-size: 1.05rem;
+}
+
+.portion-meter {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-green-soft);
+}
+
+.portion-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-green), #3fa36b);
+}
+
+.offer-card__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.offer-card__details dt {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.offer-card__details dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.offer-card__link {
+  color: var(--color-green);
+}
+
+.status-badge--positive {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.status-badge--negative {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.status-badge--neutral {
+  background: #eceee9;
+  color: #4d5650;
+}
+
+.offer-detail__main,
+.offer-detail__aside > *,
+.moderation-card,
+.empty-state {
+  border-color: var(--color-border);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+.pickup-code strong {
+  color: var(--color-green-dark);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  letter-spacing: 0.25em;
+}
+
+.pickup-code {
+  border: 2px dashed var(--color-gold);
+  background: #fff8ee;
+}
+
+.moderation-tab.is-active {
+  background: var(--color-green);
+  color: var(--color-white);
+}
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-white);
+}
+
+.offer-facts dd,
+.reservation-details dd {
+  text-transform: capitalize;
 }
 
 @media (width <= 900px) {
