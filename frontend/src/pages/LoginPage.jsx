@@ -4,6 +4,17 @@ import { useAuth } from '../hooks/useAuth';
 import Button from '../components/ui/Button';
 import TextField from '../components/ui/TextField';
 
+// Local demo accounts created by `npm run db:seed` (see backend/.env.example and README).
+const DEMO_ACCOUNTS = [
+  { label: 'Admin', email: 'admin@example.test', password: 'admin123@123' },
+  { label: 'Donor', email: 'donor@example.test', password: 'donor123@123' },
+  {
+    label: 'Recipient',
+    email: 'recipient@example.test',
+    password: 'recipient123@123',
+  },
+];
+
 function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -76,6 +87,22 @@ function LoginPage() {
             {submitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
+        <div className="stack-form" aria-label="Demo accounts">
+          <p className="auth-card__intro">Or fill in a demo account:</p>
+          {DEMO_ACCOUNTS.map((account) => (
+            <Button
+              className="button--wide"
+              key={account.email}
+              type="button"
+              variant="secondary"
+              onClick={() =>
+                setValues({ email: account.email, password: account.password })
+              }
+            >
+              {account.label} demo
+            </Button>
+          ))}
+        </div>
         <p className="auth-card__switch">
           New around here? <Link to="/register">Create an account</Link>
         </p>

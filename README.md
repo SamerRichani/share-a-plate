@@ -114,7 +114,29 @@ frontend/
 
 ### Authentication and API integration
 
-The frontend sends the API’s one-hour JWT as a bearer token held **in memory only**. It is not written to local storage, session storage, or a cookie; reloading the page signs the user out. A `401` response clears the current session and prompts the user to sign in again. Public registration offers donor and recipient roles only; administrator accounts are created through the backend seed process.
+The frontend sends the API’s one-hour JWT as a bearer token held **in memory only**. It is not written to local storage, session storage, or a cookie; reloading the page signs the user out. A `401` response clears the current session and prompts the user to sign in again. Public registration offers donor and recipient roles only; local demo accounts are created through the backend seed process. Running the seed also adds five clearly labeled demo offers with example pickup details.
+
+### Local demo accounts
+
+The app ships with three demo accounts, one per role. Their credentials are defined in [`backend/.env.example`](backend/.env.example):
+
+| Account | Role | Email | Password | `.env` keys |
+| --- | --- | --- | --- | --- |
+| Administrator | `administrator` | `admin@example.test` | `admin123@123` | `ADMIN_EMAIL`, `ADMIN_PASSWORD` |
+| Community Kitchen | `donor` | `donor@example.test` | `donor123@123` | `DEMO_DONOR_EMAIL`, `DEMO_DONOR_PASSWORD` |
+| Demo Recipient | `recipient` | `recipient@example.test` | `recipient123@123` | `DEMO_RECIPIENT_EMAIL`, `DEMO_RECIPIENT_PASSWORD` |
+
+To create them, from `backend/`:
+
+```bash
+cp .env.example .env    # only if backend/.env does not exist yet
+npm run db:migrate
+npm run db:seed
+```
+
+The seed creates each account, or resets its password to the value in `.env` if it already exists (it errors if an email is already used by another role), and adds five demo offers for the donor. The login page has **Admin demo**, **Donor demo**, and **Recipient demo** buttons that fill in these credentials; if you change them in `backend/.env`, update `DEMO_ACCOUNTS` in [`frontend/src/pages/LoginPage.jsx`](frontend/src/pages/LoginPage.jsx) too.
+
+These are demo-only passwords for local development. Do not reuse them for a deployed environment.
 
 The interface uses the backend’s role restrictions and status transitions. Offer and reservation quantities, availability, collection windows, cancellation, and moderation are validated by the API; rejected changes are shown to the user rather than treated as successful. The API remains authoritative for concurrent reservations and pickup confirmation.
 

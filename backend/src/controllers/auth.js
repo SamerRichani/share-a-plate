@@ -3,6 +3,12 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 const { secret } = require('../config/auth');
 
+function createToken(user) {
+  return jwt.sign({}, secret, {
+    algorithm: 'HS256', subject: String(user.id), expiresIn: '1h',
+  });
+}
+
 async function register(req, res) {
   const { name, email, password, role } = req.body || {};
 
@@ -24,7 +30,8 @@ async function register(req, res) {
 
   if (!result.rowCount) return res.status(409).json({ error: 'Email already registered.' });
 
-  res.status(201).json({ user: result.rows[0] });
+  const user = result.rows[0];
+  res.status(201).json({ token: createToken(user), user });
 }
 
 async function login(req, res) {
@@ -42,11 +49,8 @@ async function login(req, res) {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 
-  const token = jwt.sign({}, secret, {
-    algorithm: 'HS256', subject: String(user.id), expiresIn: '1h',
-  });
-
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  const authenticatedUser = { id: user.id, name: user.name, email: user.email, role: user.role };
+  res.json({ token: createToken(authenticatedUser), user: authenticatedUser });
 }
 
 function getMe(req, res) {

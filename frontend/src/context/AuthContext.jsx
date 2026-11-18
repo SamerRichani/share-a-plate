@@ -31,10 +31,13 @@ export function AuthProvider({ children }) {
     return result.user;
   }, []);
 
-  const register = useCallback(
-    (details) => api.post('/auth/register', details),
-    [],
-  );
+  const register = useCallback(async (details) => {
+    const result = await api.post('/auth/register', details);
+    setAccessToken(result.token);
+    setUser(result.user);
+    setNotice('');
+    return result.user;
+  }, []);
 
   const logout = useCallback(() => {
     setAccessToken(null);

@@ -29,10 +29,7 @@ function RegisterPage() {
     setSubmitting(true);
     try {
       await register(values);
-      navigate('/login', {
-        replace: true,
-        state: { message: 'Your account is ready. Sign in to get started.' },
-      });
+      navigate('/', { replace: true });
     } catch (requestError) {
       setError(requestError.message);
     } finally {

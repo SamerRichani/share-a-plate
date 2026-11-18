@@ -45,12 +45,14 @@ npm run db:migrate
 
 The runner applies ordered SQL files in one transaction and records their names. Running it again skips applied files. Run one migration process at a time. Add a new numbered migration for future changes instead of editing an applied file.
 
-To create a local administrator, add `ADMIN_EMAIL` and `ADMIN_PASSWORD` to your ignored local environment file, then run:
+To create local demo accounts, set `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `DEMO_DONOR_EMAIL`/`DEMO_DONOR_PASSWORD`, and `DEMO_RECIPIENT_EMAIL`/`DEMO_RECIPIENT_PASSWORD` in your ignored local environment file, then run:
 
 ```bash
 npm run db:seed
 ```
 
-Use your chosen email and a password of at least 12 characters and at most 72 UTF-8 bytes (bcrypt's limit). The seed hashes the password with bcrypt and never prints it. Re-running leaves an existing administrator unchanged and never promotes another role. Remove the seed credentials from the environment file after use; they are not needed to run the server. No shared default password or fictitious accounts are inserted automatically.
+Choose distinct emails and set a password for each account. Passwords must be at least 12 characters and at most 72 UTF-8 bytes (bcrypt's limit). Re-running synchronizes each account's password hash with the value in the ignored environment file, but never changes its role. It errors if a configured email already belongs to a different role. Store the passwords in the ignored environment file, not in the tracked example file.
+
+The seed also creates five sample offers for the demo donor with future pickup windows. The offers are labeled as previews, use example pickup locations, and are not real food availability. Re-running the seed does not duplicate existing demo offers. If the previous seed created `community-kitchen@demo.invalid`, its demo offers are moved to the configured demo donor.
 
 SQL schema: [001_initial_schema.sql](migrations/001_initial_schema.sql). Commands: [migrate.js](migrate.js) and [seed.js](seed.js).

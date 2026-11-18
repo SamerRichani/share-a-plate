@@ -4,7 +4,7 @@ The API uses bcrypt password hashes and HS256 JWT bearer tokens valid for one ho
 
 | Endpoint | Request | Success |
 | --- | --- | --- |
-| `POST /api/auth/register` | JSON: `name`, `email`, `password`, `role` | 201 with `{ user }`; then log in |
+| `POST /api/auth/register` | JSON: `name`, `email`, `password`, `role` | 201 with `{ token, user }`; account is signed in automatically |
 | `POST /api/auth/login` | JSON: `email`, `password` | 200 with `{ token, user }` |
 | `GET /api/auth/me` | Header: `Authorization: Bearer <token>` | 200 with `{ user }` |
 
