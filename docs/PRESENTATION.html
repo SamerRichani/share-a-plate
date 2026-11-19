@@ -1,9 +1,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ShareAPlate Presentation Guide</title>
+<title>ShareAPlate Team Handbook</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: one reading column with a sticky section nav; presenter cards and Q&A blocks. Colours match the refreshed ShareAPlate app. */
+/* Layout: sticky sidebar of sections on wide screens (top bar on phones), one reading column; feature walkthroughs as numbered trails of file:line stops. */
 :root {
   --bg: #f4f7f1;
   --surface: #ffffff;
@@ -11,52 +11,87 @@
   --muted: #4d5c52;
   --green: #1d6b45;
   --green-soft: #e2f0e6;
-  --gold: #c97a14;
+  --gold: #b86e0f;
   --gold-soft: #fdf0dc;
   --blue: #2f5d73;
   --blue-soft: #e3eff4;
   --red: #a33a2b;
   --red-soft: #fbe7e3;
   --border: #dbe3d8;
+  --code-bg: #f0f4ee;
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111a14; --surface: #1a251e; --ink: #e7efe8; --muted: #a6b5aa;
-    --green: #6fcf97; --green-soft: #1f3a2a; --gold: #f2b057; --gold-soft: #3a2c16;
-    --blue: #8cc3dc; --blue-soft: #1c2f38; --red: #f08a7a; --red-soft: #3a1f1a; --border: #2c3a30;
+    --bg: #101813; --surface: #18231c; --ink: #e7efe8; --muted: #a6b5aa;
+    --green: #6fcf97; --green-soft: #1d3527; --gold: #f2b057; --gold-soft: #382a15;
+    --blue: #8cc3dc; --blue-soft: #1b2d36; --red: #f08a7a; --red-soft: #391e19; --border: #2b392f; --code-bg: #131d16;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111a14; --surface: #1a251e; --ink: #e7efe8; --muted: #a6b5aa;
-  --green: #6fcf97; --green-soft: #1f3a2a; --gold: #f2b057; --gold-soft: #3a2c16;
-  --blue: #8cc3dc; --blue-soft: #1c2f38; --red: #f08a7a; --red-soft: #3a1f1a; --border: #2c3a30;
+  --bg: #101813; --surface: #18231c; --ink: #e7efe8; --muted: #a6b5aa;
+  --green: #6fcf97; --green-soft: #1d3527; --gold: #f2b057; --gold-soft: #382a15;
+  --blue: #8cc3dc; --blue-soft: #1b2d36; --red: #f08a7a; --red-soft: #391e19; --border: #2b392f; --code-bg: #131d16;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16.5px; line-height: 1.6; }
+html { scroll-padding-top: 72px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
 
-.topnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); }
-.topnav__inner { max-width: 960px; margin: 0 auto; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 6px; overflow-x: auto; }
-.topnav a { flex: 0 0 auto; color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; padding: 6px 12px; border-radius: 999px; }
-.topnav a:hover, .topnav a:focus-visible { background: var(--green-soft); color: var(--ink); outline: none; }
+.shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); max-width: 1240px; margin: 0 auto; gap: 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.side { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 28px; }
+.side .brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin-bottom: 14px; display: block; }
+.side ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: s; }
+.side a { display: grid; grid-template-columns: 26px 1fr; gap: 4px; color: var(--muted); text-decoration: none; font-size: 0.9rem; padding: 6px 10px; border-radius: 8px; }
+.side li { counter-increment: s; }
+.side a::before { content: counter(s); font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); opacity: 0.7; padding-top: 2px; }
+.side a:hover, .side a:focus-visible { background: var(--green-soft); color: var(--ink); outline: none; }
+.side .weight { margin-top: 18px; padding: 12px; border-radius: 12px; background: var(--gold-soft); font-size: 0.85rem; }
 
-.page { max-width: 960px; margin: 0 auto; padding-block: 40px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 64px; }
-section { display: grid; gap: 18px; scroll-margin-top: 70px; }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 750; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
-h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); }
-h2 { font-size: 1.8rem; }
-h3 { font-size: 1.15rem; }
-p { margin: 0; max-width: 70ch; }
-.eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); font-weight: 800; }
-.lead { font-size: 1.15rem; color: var(--muted); }
-code { font-family: var(--font-mono); font-size: 0.86em; background: var(--green-soft); padding: 1px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+.page { padding-block: 32px 96px; display: grid; gap: 72px; min-width: 0; }
+section { display: grid; gap: 18px; min-width: 0; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 750; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2rem); }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1rem; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); font-weight: 800; }
+.lead { font-size: 1.12rem; color: var(--muted); }
 .muted { color: var(--muted); }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: grid; gap: 10px; min-width: 0; }
+code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); border: 1px solid var(--border); padding: 0 5px; border-radius: 5px; overflow-wrap: anywhere; }
+pre { margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: grid; gap: 10px; min-width: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.callout { border-left: 4px solid var(--gold); background: var(--gold-soft); padding: 12px 16px; border-radius: 0 12px 12px 0; }
+.callout.green { border-color: var(--green); background: var(--green-soft); }
+.callout.red { border-color: var(--red); background: var(--red-soft); }
+ul.tight, ol.tight { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+table.wide { min-width: 680px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; font-size: 0.72rem; font-weight: 800; padding: 1px 9px; border-radius: 999px; white-space: nowrap; }
+.ok { background: var(--green-soft); color: var(--green); }
+.todo { background: var(--red-soft); color: var(--red); }
+.part { background: var(--gold-soft); color: var(--gold); }
+
+/* Milestones */
+.miles { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.miles li { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--border); }
+.miles li:first-child { border-top: 0; }
+.miles .when { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+.miles .when b { display: block; font-family: var(--font-display); font-size: 1rem; color: var(--ink); }
+.commits { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
 
 /* Timeline */
 .timeline { display: flex; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
@@ -65,299 +100,728 @@ code { font-family: var(--font-mono); font-size: 0.86em; background: var(--green
 .timeline .p2 { flex: 3; background: var(--gold-soft); }
 .timeline .p3 { flex: 2.75; background: var(--blue-soft); }
 .timeline span { display: block; font-weight: 500; color: var(--muted); font-size: 0.8rem; }
-.callout { border-left: 4px solid var(--gold); background: var(--gold-soft); padding: 12px 16px; border-radius: 0 12px 12px 0; }
-
-/* Presenters */
-.presenters { display: grid; gap: 16px; }
 .presenter { border-top: 6px solid var(--green); }
 .presenter.p2 { border-top-color: var(--gold); }
 .presenter.p3 { border-top-color: var(--blue); }
-.presenter header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
-.time { font-family: var(--font-mono); font-weight: 700; font-size: 0.9rem; color: var(--muted); }
 .beats { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.beats li { display: grid; grid-template-columns: 64px 1fr; gap: 12px; }
-.beats .t { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); padding-top: 2px; }
+.beats li { display: grid; grid-template-columns: 52px 1fr; gap: 10px; }
+.beats .t { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); padding-top: 2px; }
 .say { display: block; color: var(--green); font-style: italic; }
-.show { display: block; font-size: 0.9rem; color: var(--muted); }
 
-/* Demo checklist */
-.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.steps label { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; cursor: pointer; }
-.steps input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--green); }
-.steps input:checked + span { color: var(--muted); text-decoration: line-through; }
-.steps input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.reset { justify-self: start; font: inherit; font-size: 0.9rem; background: var(--surface); border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+/* Architecture diagram */
+.arch { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
+.arch .box { border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: var(--surface); display: grid; gap: 4px; align-content: start; min-width: 0; }
+.arch .box b { font-family: var(--font-display); font-size: 1.1rem; }
+.arch .tech { font-family: var(--font-mono); font-size: 0.78rem; color: var(--green); }
+.arch .arrow { align-self: center; color: var(--gold); font-size: 1.5rem; text-align: center; }
+.arch .arrow small { display: block; font-size: 0.7rem; color: var(--muted); font-family: var(--font-mono); }
+.pipeline { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-family: var(--font-mono); font-size: 0.8rem; }
+.pipeline span { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; }
+.pipeline i { color: var(--gold); font-style: normal; }
 
-/* Code tour */
-.files { display: grid; gap: 12px; }
-.file { display: grid; gap: 6px; }
-.file .path { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--green); overflow-wrap: anywhere; }
-pre { margin: 0; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.5; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; overflow-x: auto; }
+/* DB tables */
+.tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.dbt { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.dbt h4 { background: var(--green); color: var(--surface); padding: 8px 14px; font-family: var(--font-mono); font-size: 0.95rem; letter-spacing: 0; }
+.dbt ul { list-style: none; margin: 0; padding: 6px 0; }
+.dbt li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 4px 14px; font-size: 0.85rem; }
+.dbt li span:first-child { font-family: var(--font-mono); overflow-wrap: anywhere; }
+.dbt li span:last-child { color: var(--muted); font-size: 0.75rem; text-align: right; }
+.dbt .rule { padding: 8px 14px 12px; font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--border); }
+.lifecycle { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 0.85rem; }
+.lifecycle b { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; font-weight: 600; }
+.lifecycle i { color: var(--gold); font-style: normal; }
+
+/* File list */
+.files { display: grid; gap: 8px; }
+.file { display: grid; grid-template-columns: minmax(180px, 280px) minmax(0, 1fr); gap: 14px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.file .path { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--green); overflow-wrap: anywhere; }
+.file p { font-size: 0.92rem; }
+
+/* Feature trails */
+.feature { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: grid; gap: 12px; }
+.feature header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+.trail { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: t; }
+.trail li { counter-increment: t; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; padding-bottom: 12px; position: relative; }
+.trail li::before { content: counter(t); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 0.78rem; font-weight: 800; background: var(--green-soft); color: var(--green); }
+.trail li:not(:last-child)::after { content: ""; position: absolute; left: 12px; top: 28px; bottom: 2px; width: 2px; background: var(--border); }
+.trail .loc { font-family: var(--font-mono); font-size: 0.8rem; color: var(--blue); font-weight: 700; overflow-wrap: anywhere; }
+.trail .layer { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+.trail p { font-size: 0.93rem; }
 
 /* Q&A */
-.filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.filters button { font: inherit; font-size: 0.88rem; font-weight: 600; border: 1px solid var(--border); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
-.filters button[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--surface); }
+.qa-tools { display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--bg); padding-block: 10px; }
+.qa-tools input { width: 100%; font: inherit; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); color: var(--ink); }
+.qa-tools input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 4px var(--green-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { font: inherit; font-size: 0.84rem; font-weight: 600; border: 1px solid var(--border); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.chips button[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--surface); }
+.chips button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.count { font-size: 0.85rem; color: var(--muted); }
 .qa { display: grid; gap: 8px; }
 details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
-summary { cursor: pointer; font-weight: 700; list-style-position: outside; }
-summary .lvl { display: inline-block; margin-right: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 8px; border-radius: 999px; vertical-align: 2px; }
-.lvl.easy { background: var(--green-soft); color: var(--green); }
-.lvl.hard { background: var(--gold-soft); color: var(--gold); }
+summary { cursor: pointer; font-weight: 700; }
+summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 4px; }
+.tag { display: inline-block; margin-right: 6px; font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 7px; border-radius: 999px; vertical-align: 2px; background: var(--blue-soft); color: var(--blue); }
+.tag.easy { background: var(--green-soft); color: var(--green); }
+.tag.hard { background: var(--gold-soft); color: var(--gold); }
 details > div { margin-top: 10px; display: grid; gap: 8px; color: var(--muted); }
 details > div b { color: var(--ink); }
-.where { font-size: 0.85rem; }
+.where { font-family: var(--font-mono); font-size: 0.78rem; color: var(--blue); }
 
-/* Security table */
-.sec-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.92rem; }
-th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--bg); }
-tr:last-child td { border-bottom: 0; }
-td:first-child { font-weight: 700; }
 .limits { display: grid; gap: 10px; }
 .limit { border-left: 4px solid var(--red); background: var(--red-soft); border-radius: 0 12px 12px 0; padding: 12px 16px; }
 .limit b { display: block; }
-
-.check { display: grid; gap: 6px; padding-left: 20px; margin: 0; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.steps label { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; cursor: pointer; }
+.steps input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--green); }
+.steps input:checked + span { color: var(--muted); text-decoration: line-through; }
 .glossary { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 0; }
 .glossary dt { font-weight: 700; }
 .glossary dd { margin: 0; color: var(--muted); min-width: 0; }
-@media (max-width: 560px) { .glossary { grid-template-columns: 1fr; } .glossary dd { margin-bottom: 6px; } .beats li { grid-template-columns: 1fr; gap: 2px; } }
-footer { color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .side { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; max-height: none; overflow: visible; padding-block: 8px; background: var(--bg); border-bottom: 1px solid var(--border); margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .side .brand, .side .weight { display: none; }
+  .side ol { display: flex; gap: 4px; overflow-x: auto; }
+  .side a { display: block; white-space: nowrap; }
+  .side a::before { display: none; }
+  .qa-tools { top: calc(env(safe-area-inset-top, 0px) + 52px); }
+  html { scroll-padding-top: 64px; }
+}
+@media (max-width: 640px) {
+  .arch { grid-template-columns: 1fr; }
+  .arch .arrow { transform: rotate(90deg); }
+  .arch .arrow small { transform: rotate(-90deg); }
+  .file { grid-template-columns: 1fr; gap: 4px; }
+  .miles li { grid-template-columns: 1fr; gap: 4px; }
+  .glossary { grid-template-columns: 1fr; }
+  .glossary dd { margin-bottom: 6px; }
+}
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 </style>
 
-<nav class="topnav" aria-label="Sections">
-  <div class="topnav__inner">
-    <a href="#plan">8-min plan</a>
-    <a href="#demo">Demo script</a>
-    <a href="#code">Code tour</a>
-    <a href="#prof">Professor Q&amp;A</a>
-    <a href="#security">Security Q&amp;A</a>
-    <a href="#before">Before you start</a>
-    <a href="#words">Glossary</a>
-  </div>
+<div class="shell">
+<nav class="side" aria-label="Sections">
+  <span class="brand">ShareAPlate</span>
+  <ol>
+    <li><a href="#overview">Overview &amp; grading</a></li>
+    <li><a href="#milestones">Milestones</a></li>
+    <li><a href="#plan">8-minute plan</a></li>
+    <li><a href="#run">Run the project</a></li>
+    <li><a href="#use">Use the website</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#database">Database</a></li>
+    <li><a href="#backend">Backend files</a></li>
+    <li><a href="#frontend">Frontend files</a></li>
+    <li><a href="#features">How we built each feature</a></li>
+    <li><a href="#why">Why we did it this way</a></li>
+    <li><a href="#security">Security</a></li>
+    <li><a href="#questions">Coding questions</a></li>
+    <li><a href="#glossary">Glossary</a></li>
+  </ol>
+  <div class="weight"><b>40% of the grade</b> is coding questions and security. Sections 10, 12 and 13 are the ones to study.</div>
 </nav>
 
 <main class="page">
 
-  <section aria-labelledby="top-title">
-    <p class="eyebrow">Presentation guide · Samer, Alfred &amp; Ziad</p>
-    <h1 id="top-title">ShareAPlate</h1>
-    <p class="lead">A full-stack web app (React + Express + PostgreSQL) that lets restaurants and shops give leftover food to people and charities nearby, instead of throwing it away.</p>
-    <div class="callout">The professor's brief asks for <b>5–8 minutes</b> covering: the problem, a live walkthrough, <b>one technical challenge</b>, and <b>what you'd build next</b>. This plan runs 8 minutes. Then comes Q&amp;A.</div>
-  </section>
+<!-- 1. OVERVIEW -->
+<section id="overview" aria-labelledby="overview-title">
+  <p class="eyebrow">Team handbook · Samer Richani, Alfred Haber, Ziad Boutros</p>
+  <h1 id="overview-title">ShareAPlate</h1>
+  <p class="lead">A full-stack web app where restaurants and shops post leftover food, and people or charities nearby reserve it and pick it up with a code. Built with React, Express and PostgreSQL.</p>
+  <div class="callout"><b>How to use this page.</b> When the professor asks "how did you do X?", go to <a href="#features">section 10</a>: each feature is a numbered trail of <b>file:line</b> stops from the button the user clicks down to the database. Open those files in the editor and walk through them in order.</div>
 
-  <section id="plan" aria-labelledby="plan-title">
-    <p class="eyebrow">Run of show</p>
-    <h2 id="plan-title">8 minutes, 3 presenters</h2>
-    <div class="timeline" role="img" aria-label="Presenter 1: 0:00 to 2:15, Presenter 2: 2:15 to 5:15, Presenter 3: 5:15 to 8:00">
-      <div class="p1">Presenter 1<span>0:00–2:15</span></div>
-      <div class="p2">Presenter 2<span>2:15–5:15</span></div>
-      <div class="p3">Presenter 3<span>5:15–8:00</span></div>
-    </div>
-    <p class="muted">Pick who is who. A good fit: the person most comfortable with code takes Presenter 3. During Q&amp;A, each person answers questions about their own part.</p>
+  <h3>Checked against the professor's requirements</h3>
+  <div class="table-wrap">
+    <table class="wide">
+      <thead><tr><th>Requirement</th><th>Status</th><th>Where to show it</th></tr></thead>
+      <tbody>
+        <tr><td>React front end, multiple components, client-side routing</td><td><span class="pill ok">Done</span></td><td><code>frontend/src/app/App.jsx</code> (React Router), 10 pages, 12 components</td></tr>
+        <tr><td>Express/Node back end exposing a RESTful API</td><td><span class="pill ok">Done</span></td><td><code>backend/src/app.js</code>, <code>backend/src/routes/</code> (19 endpoints)</td></tr>
+        <tr><td>Persistent database</td><td><span class="pill ok">Done</span></td><td>PostgreSQL, 4 tables, <code>backend/db/migrations/001_initial_schema.sql</code></td></tr>
+        <tr><td>Signup, login, protected routes</td><td><span class="pill ok">Done</span></td><td><code>controllers/auth.js</code>, <code>middleware/auth.js</code>, <code>App.jsx</code> RequireAuth / RoleRoute</td></tr>
+        <tr><td>Third-party API <b>or</b> non-trivial custom feature</td><td><span class="pill ok">Done</span></td><td>Reservation system: transactions + row locking, random pickup codes, status lifecycle (<code>controllers/reservations.js</code>)</td></tr>
+        <tr><td>Responsive (mobile + desktop)</td><td><span class="pill ok">Done</span></td><td><code>global.css</code> breakpoints at 900 / 700 / 400 px</td></tr>
+        <tr><td>Deployed to a live public URL</td><td><span class="pill todo">To do</span></td><td>Ready to deploy as one service; steps in <code>docs/DEPLOYMENT.md</code></td></tr>
+        <tr><td>≥1 automated front-end and back-end test</td><td><span class="pill ok">Done</span></td><td>13 backend tests (<code>backend/test/</code>), 6 frontend tests (<code>frontend/src/tests/</code>), <code>npm test</code></td></tr>
+        <tr><td>README: setup, features, stack, architecture</td><td><span class="pill ok">Done</span></td><td><code>README.md</code></td></tr>
+        <tr><td>Passwords hashed, inputs validated, secrets not committed</td><td><span class="pill ok">Done</span></td><td>bcrypt; <code>utils/validation.js</code>; <code>.env</code> git-ignored, key rotated</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-    <div class="presenters">
-      <article class="card presenter p1">
-        <header><h3>Presenter 1 · Problem, users &amp; architecture</h3><span class="time">2:15</span></header>
-        <ol class="beats">
-          <li><span class="t">0:00</span><div><b>The problem.</b><span class="say">"Every evening, restaurants and bakeries throw away good food while people nearby could use it. ShareAPlate connects them."</span><span class="show">Show: the homepage.</span></div></li>
-          <li><span class="t">0:40</span><div><b>Three roles.</b><span class="say">"Donors post food. Recipients reserve it and get a pickup code. Administrators keep the platform safe."</span><span class="show">Show: scroll to "Sharing is simple".</span></div></li>
-          <li><span class="t">1:15</span><div><b>Architecture.</b><span class="say">"React website, Express REST API, PostgreSQL database with four tables: users, offers, reservations, reports. The browser sends JSON to the API; every request passes security headers, a rate limit, a login check and a role check before touching the database."</span><span class="show">Show: README "Architecture" diagram.</span></div></li>
-          <li><span class="t">2:00</span><div><b>Hand-off.</b><span class="say">"Let's see it live."</span></div></li>
-        </ol>
-      </article>
+  <h3>Grading rubric</h3>
+  <div class="table-wrap">
+    <table class="wide">
+      <thead><tr><th>Criterion</th><th>Points</th><th>Our evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Functionality</td><td>30</td><td>Full donor → recipient → pickup → admin flow works end to end (live demo)</td></tr>
+        <tr><td>Code quality &amp; organisation</td><td>20</td><td>routes / controllers / middleware / utils split; commented; frontend pages / components / services / context</td></tr>
+        <tr><td>Design &amp; UX</td><td>15</td><td>Consistent design tokens, responsive, accessible (skip link, labels, focus styles)</td></tr>
+        <tr><td>Security &amp; testing</td><td>15</td><td>See <a href="#security">section 12</a>; 19 automated tests</td></tr>
+        <tr><td>Documentation</td><td>10</td><td>README, DEPLOYMENT.md, SCHEMA.md, this handbook</td></tr>
+        <tr><td>Presentation</td><td>10</td><td><a href="#plan">Section 3</a> plan + Q&amp;A prep</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 
-      <article class="card presenter p2">
-        <header><h3>Presenter 2 · Live demo</h3><span class="time">3:00</span></header>
-        <ol class="beats">
-          <li><span class="t">2:15</span><div><b>Donor posts food.</b> Sign in with <b>Donor demo</b> → My offers → Create an offer ("Leftover pizza", 4 portions, pickup now until tonight).<span class="say">"A restaurant posts food in under a minute."</span></div></li>
-          <li><span class="t">3:00</span><div><b>Recipient reserves.</b> Sign out → <b>Recipient demo</b> → Find food → filter by area → open the pizza → reserve 2.<span class="say">"The 2 portions are now held. Here's the pickup code. Only this person and the donor can see it."</span><span class="show">Read the code out loud and write it down.</span></div></li>
-          <li><span class="t">4:00</span><div><b>Donor confirms pickup.</b> Sign out → <b>Donor demo</b> → My offers → pizza → Reservations → type the code → Confirm pickup.<span class="say">"The code proves the right person collected the food."</span></div></li>
-          <li><span class="t">4:40</span><div><b>Admin.</b> Sign out → <b>Admin demo</b> → Moderation → Reports / Offers.<span class="say">"Admins resolve reports and can remove offers that break the rules."</span><span class="show">Also mention: it works on mobile (if time, resize the window).</span></div></li>
-        </ol>
-      </article>
+<!-- 2. MILESTONES -->
+<section id="milestones" aria-labelledby="milestones-title">
+  <p class="eyebrow">Following the brief</p>
+  <h2 id="milestones-title">Milestones</h2>
+  <p>The brief asks for each milestone to be a visible commit or tag. Here is how our Git history maps to them.</p>
+  <div class="card">
+    <ol class="miles">
+      <li><span class="when"><b>Proposal</b>Session 19</span><div><p>1-page proposal: idea, features, tech stack, schema sketch. The required and optional features in <code>docs/DEVELOPMENT.md</code> §1 come from it.</p><span class="pill ok">Done</span></div></li>
+      <li><span class="when"><b>Milestone 1</b>Session 20</span><div><p>Scaffold + finalised database schema: Express server, PostgreSQL connection, 4-table migration; React + Vite project.</p><p class="commits">d5ae221 express backend + postgres db · c9d0de3 packages + frontend initialisation</p><span class="pill ok">Done</span></div></li>
+      <li><span class="when"><b>Milestone 2</b>Session 21</span><div><p>Core back end: authentication + CRUD routes for offers, reservations, reports, admin.</p><p class="commits">f726e71 authentication apis · 6d06855 offers apis · d2036df reservations apis · a491ad1 reports apis and admin access</p><span class="pill ok">Done</span></div></li>
+      <li><span class="when"><b>Milestone 3</b>Session 22</span><div><p>Front end integrated with the back end; all user features working.</p><p class="commits">4b2510e readme files · 993e73e frontend updates · 5e446a2 demo accounts, login demo buttons, API port</p><span class="pill ok">Done</span></div></li>
+      <li><span class="when"><b>Milestone 4</b>Session 23</span><div><p>Deployed to a live public URL (front end + API).</p><p class="muted">The app is prepared: <code>npm run build</code> + <code>npm run start:prod</code>, one web service + hosted PostgreSQL. Follow <code>docs/DEPLOYMENT.md</code> (Render + Neon, both free).</p><span class="pill todo">Still to do</span></div></li>
+      <li><span class="when"><b>Final</b>Session 24</span><div><p>Polished project + 5–8 minute presentation and Q&amp;A.</p><p class="commits">f5ad485 ui update + security adjustments (redesign, refactor, tests, security hardening, docs)</p><span class="pill part">Presentation tomorrow</span></div></li>
+    </ol>
+  </div>
+  <div class="callout green"><b>Make the milestones visible as tags</b> (run once in the project folder, then push the tags):
+<pre><code>git tag milestone-1 c9d0de3
+git tag milestone-2 a491ad1
+git tag milestone-3 5e446a2
+git tag final f5ad485
+git push origin --tags</code></pre></div>
+</section>
 
-      <article class="card presenter p3">
-        <header><h3>Presenter 3 · Code, challenge, security &amp; next steps</h3><span class="time">2:45</span></header>
-        <ol class="beats">
-          <li><span class="t">5:15</span><div><b>Code organisation.</b><span class="say">"The backend is split into routes (which URL, which role), controllers (the rules), and middleware (login checks and protections). The frontend has one file per page, reusable components, and a single api.js that talks to the server."</span><span class="show">Show: <code>backend/src/routes/offers.js</code>.</span></div></li>
-          <li><span class="t">6:00</span><div><b>The technical challenge: two people, one last portion.</b><span class="say">"If two people reserve the last portion at the same instant, both could get it. We solved it with a database transaction and SELECT … FOR UPDATE, which locks the offer row. The second request waits, then sees zero left."</span><span class="show">Show: <code>createReservation</code> in <code>backend/src/controllers/reservations.js</code>.</span></div></li>
-          <li><span class="t">6:50</span><div><b>Security &amp; tests.</b><span class="say">"Passwords hashed with bcrypt, signed login tokens checked on every request, role and ownership checks on the server, parameterised SQL, a Content-Security-Policy, and rate limiting. We have 13 backend and 6 frontend automated tests."</span><span class="show">Show: run <code>npm test</code> (takes ~3 seconds).</span></div></li>
-          <li><span class="t">7:30</span><div><b>What's next.</b><span class="say">"Email reminders, a map of nearby offers, a 'meals saved' dashboard, and two-factor login for admins. Thank you, happy to take questions."</span></div></li>
-        </ol>
-      </article>
-    </div>
-  </section>
-
-  <section id="demo" aria-labelledby="demo-title">
-    <p class="eyebrow">Presenter 2</p>
-    <h2 id="demo-title">Demo checklist</h2>
-    <p class="muted">Tick as you go. Ticks are saved in your own browser only.</p>
-    <ul class="steps">
-      <li><label><input type="checkbox" id="d1"><span>Homepage open at <code>http://localhost:5173</code> (or the live URL)</span></label></li>
-      <li><label><input type="checkbox" id="d2"><span>Donor: create "Leftover pizza", 4 portions, pickup from now until tonight</span></label></li>
-      <li><label><input type="checkbox" id="d3"><span>Recipient: filter, open the pizza, reserve 2, <b>write down the code</b></span></label></li>
-      <li><label><input type="checkbox" id="d4"><span>Recipient (optional): Report this offer → "Test report" → Send report</span></label></li>
-      <li><label><input type="checkbox" id="d5"><span>Donor: My offers → pizza → Reservations → type code → Confirm pickup → shows "Collected"</span></label></li>
-      <li><label><input type="checkbox" id="d6"><span>Admin: Moderation → resolve the report → show the Offers tab</span></label></li>
-    </ul>
-    <button class="reset" type="button" id="reset-steps">Untick all</button>
-  </section>
-
-  <section id="code" aria-labelledby="code-title">
-    <p class="eyebrow">Presenter 3 · and for the professor's questions</p>
-    <h2 id="code-title">Code tour: the 6 files to know</h2>
-    <p>If the professor asks "show me how X works", open these. Each one is short and commented.</p>
-    <div class="files">
-      <div class="card file">
-        <span class="path">backend/src/app.js</span>
-        <p>Builds the server: security headers → JSON body (max 100 KB) → rate limits → the four route groups → error handler. In production it also serves the built React site.</p>
-      </div>
-      <div class="card file">
-        <span class="path">backend/src/routes/offers.js</span>
-        <p>The URL list. Each line says the HTTP verb, the URL, who's allowed, and which function runs.</p>
-        <pre>router.use(authenticate);                       // must be signed in
-router.post('/', authorize('donor'), createOffer); // only donors</pre>
-      </div>
-      <div class="card file">
-        <span class="path">backend/src/middleware/auth.js</span>
-        <p><b>authenticate</b> reads the <code>Authorization: Bearer …</code> header, verifies the JWT signature and expiry, then loads the user (and role) from the database. <b>authorize('donor')</b> returns 403 if the role doesn't match.</p>
-      </div>
-      <div class="card file">
-        <span class="path">backend/src/controllers/reservations.js → createReservation</span>
-        <p>The "last portion" challenge. Everything runs inside <code>withTransaction</code>, and the offer row is locked:</p>
-        <pre>SELECT * FROM offers WHERE id = $1 FOR UPDATE   -- lock
-... check portions left ...
-INSERT INTO reservations ...                       -- with a random pickup code
-UPDATE offers SET remaining_quantity = remaining_quantity - $1
-COMMIT                                             -- or ROLLBACK if anything failed</pre>
-      </div>
-      <div class="card file">
-        <span class="path">frontend/src/services/api.js</span>
-        <p>Every request from React goes through <code>request()</code>: adds the token header, sends JSON to <code>/api…</code>, turns errors into readable messages, and signs you out on a 401.</p>
-      </div>
-      <div class="card file">
-        <span class="path">frontend/src/app/App.jsx</span>
-        <p>Client-side routing with React Router. <code>RequireAuth</code> sends visitors to /login; <code>RoleRoute</code> hides pages for other roles. <b>These are for convenience only: the server re-checks everything.</b></p>
-      </div>
-    </div>
-  </section>
-
-  <section id="prof" aria-labelledby="prof-title">
-    <p class="eyebrow">Questions about the code</p>
-    <h2 id="prof-title">Professor Q&amp;A</h2>
-    <div class="filters" role="group" aria-label="Filter questions">
-      <button type="button" data-filter="all" aria-pressed="true">All</button>
-      <button type="button" data-filter="easy" aria-pressed="false">Easy</button>
-      <button type="button" data-filter="hard" aria-pressed="false">Hard</button>
-    </div>
-    <div class="qa" data-qa>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>What is a REST API, and what makes yours RESTful?</summary><div><p>The server exposes <b>resources</b> at URLs (<code>/api/offers</code>, <code>/api/reservations</code>) and uses HTTP verbs for actions: <b>GET</b> reads, <b>POST</b> creates, <b>PATCH</b> updates, <b>DELETE</b> removes. Data goes back and forth as JSON, and status codes say what happened.</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>What status codes do you use?</summary><div><p><b>200</b> OK · <b>201</b> created · <b>400</b> bad input · <b>401</b> not signed in / bad token · <b>403</b> signed in but not allowed · <b>404</b> not found · <b>409</b> conflict (e.g. not enough portions) · <b>413</b> body too big · <b>429</b> too many requests · <b>500</b> unexpected server error.</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>What is middleware?</summary><div><p>A function that runs <b>before</b> the route's main code, and can stop the request or pass it on with <code>next()</code>. Ours: <code>securityHeaders</code>, <code>rateLimit</code>, <code>express.json</code>, <code>authenticate</code>, <code>authorize</code>, and the error handler at the end.</p><p class="where">backend/src/middleware/</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>How does the React app talk to the server?</summary><div><p>Through <code>fetch</code> in <code>services/api.js</code>. During development, Vite's <b>proxy</b> forwards <code>/api</code> calls from port 5173 to Express on 5001. In production, Express serves the website and the API from the <b>same address</b>.</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>What is a protected route?</summary><div><p>On the <b>frontend</b>: pages wrapped in <code>RequireAuth</code>/<code>RoleRoute</code> redirect you if you're not signed in or have the wrong role. On the <b>backend</b>: routes behind <code>authenticate</code> + <code>authorize(role)</code>. The backend one is the real protection.</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>Why PostgreSQL and not MongoDB?</summary><div><p>Our data is relational: users have offers, offers have reservations and reports. PostgreSQL gives us foreign keys, CHECK constraints (e.g. quantity &gt; 0) and transactions with row locks, which we need for reservations.</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>What are components and state in your app?</summary><div><p>Components are reusable UI pieces (<code>OfferCard</code>, <code>Button</code>, <code>TextField</code>, <code>SiteHeader</code>). State is data that changes the screen, held with <code>useState</code> (e.g. the filters, the list of offers, loading/error). Signed-in user state is shared app-wide with <b>React Context</b> (<code>AuthContext</code>).</p></div></details>
-      <details data-level="easy"><summary><span class="lvl easy">Easy</span>What is a migration and a seed?</summary><div><p>A <b>migration</b> is a numbered SQL file that creates or changes tables (<code>db/migrations/001_initial_schema.sql</code>); we record which ones have run. A <b>seed</b> fills the database with demo accounts and offers (<code>db/seed.js</code>).</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>Walk me through what happens when a recipient clicks "Reserve food".</summary><div><p>1. React calls <code>api.post('/offers/5/reservations', {quantity: 2})</code> with the token. 2. Express: security headers → rate limit → <code>express.json</code>. 3. <code>authenticate</code> verifies the JWT, loads the user. 4. <code>authorize('recipient')</code>. 5. <code>validateIdParam</code> checks <code>5</code>. 6. <code>createReservation</code> validates quantity, opens a transaction, locks the offer row, checks it's active / enough portions / no duplicate reservation, inserts the reservation with a random code, lowers <code>remaining_quantity</code>, commits. 7. Replies <b>201</b> with the reservation; React shows the code.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>How do you prevent a race condition on the last portion?</summary><div><p>Transaction + <code>SELECT … FOR UPDATE</code>. The first request locks the offer row; the second waits until the first commits, then reads the <b>updated</b> remaining quantity and gets 409 "Not enough portions remain". The database also has a CHECK so <code>remaining_quantity</code> can never go below 0. We always lock the offer <b>before</b> the reservation, in every function, so two requests can't deadlock.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>Why JWT instead of server sessions? Where is it stored and why?</summary><div><p>JWT is stateless: the server doesn't keep a session table, it just checks the signature. It contains only the user id and expiry (1 hour). On the browser we keep it in <b>sessionStorage</b> so a refresh keeps you signed in, and closing the tab signs you out. Trade-off: an XSS bug could read sessionStorage; we reduce that risk with React's escaping and a strict CSP. An <b>httpOnly cookie</b> would hide it from JavaScript but then we'd need CSRF protection; it's a reasonable next step.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>Why read the role from the database instead of putting it in the token?</summary><div><p>So a role change or a deleted account takes effect immediately, and so the token holds nothing an attacker would want to change. Cost: one small query per request, using the primary key.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>Why "removed" instead of deleting offers?</summary><div><p>Soft delete keeps history: reservations and reports point to the offer (foreign keys). Removing cancels pending reservations and returns their portions, but collected ones stay as a record.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>How is the useEffect in OffersPage cleaned up?</summary><div><p>It creates an <code>AbortController</code> and returns <code>() =&gt; controller.abort()</code>. If filters change or you leave the page before the request finishes, the old request is cancelled so it can't overwrite newer results.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>How do pagination and filters work in SQL?</summary><div><p><code>LIMIT</code>/<code>OFFSET</code> from <code>?page=&amp;limit=</code> (limit capped at 100). Filters add <code>WHERE</code> conditions, but the <b>values</b> always go in as <code>$1, $2…</code>; only column names from our own fixed list are written into the SQL text.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>What do your tests cover and how do they run?</summary><div><p>Backend: Node's built-in test runner starts the real Express app on a random port and sends real HTTP requests: forged token, <code>alg:none</code> token, admin sign-up attempt, broken JSON, huge body, security headers, rate limit (13 tests). Frontend: Vitest + Testing Library render components in a fake browser (jsdom): offer card, XSS text, redirect to sign-in (6 tests). <code>npm test</code> runs both.</p></div></details>
-      <details data-level="hard"><summary><span class="lvl hard">Hard</span>How is it deployed?</summary><div><p>One Node web service: <code>npm run build</code> builds React into <code>frontend/dist</code>; <code>npm run start:prod</code> runs migrations and starts Express, which serves the site and the API. A hosted PostgreSQL connects with <code>DATABASE_URL</code> over SSL. Secrets are environment variables on the host. See <code>docs/DEPLOYMENT.md</code>.</p></div></details>
-    </div>
-  </section>
-
-  <section id="security" aria-labelledby="sec-title">
-    <p class="eyebrow">"How would I hack your website?"</p>
-    <h2 id="sec-title">Security Q&amp;A</h2>
-    <p>Answer with three parts: <b>the attack</b> in one sentence, <b>what stops it</b>, and <b>where in the code</b>. If you don't know, say "that's a good point, here's how we'd handle it". Being honest about limits scores better than bluffing.</p>
-
-    <div class="sec-table-wrap">
-      <table>
-        <thead><tr><th>Attack</th><th>What stops it</th><th>Where</th></tr></thead>
-        <tbody>
-          <tr><td>SQL injection<br><span class="muted">typing <code>' OR 1=1 --</code></span></td><td>Every query uses placeholders <code>$1, $2</code>. The database treats the input as plain text, never as SQL. Tested: searching for <code>x' OR '1'='1</code> just finds nothing.</td><td>all controllers</td></tr>
-          <tr><td>XSS<br><span class="muted">posting an offer titled <code>&lt;script&gt;</code></span></td><td>React escapes all text, so it shows as text. No <code>dangerouslySetInnerHTML</code> anywhere. Plus a Content-Security-Policy: the browser only runs scripts from our own site. A test checks this.</td><td>security.js · OfferCard.test.jsx</td></tr>
-          <tr><td>Password guessing (brute force)</td><td>Rate limit: 20 sign-in attempts per 15 min per IP, then <b>429</b>. bcrypt is deliberately slow. Minimum 12-character passwords.</td><td>app.js · security.js</td></tr>
-          <tr><td>Stealing the database</td><td>Only bcrypt hashes are stored (cost 12, salted). Cracking even one strong password would take years.</td><td>controllers/auth.js</td></tr>
-          <tr><td>Forging a login token</td><td>Tokens are signed with a 64-byte secret (HS256). Without it, any edit breaks the signature → 401. We also reject <code>alg: none</code>. Both tested.</td><td>middleware/auth.js · api.test.js</td></tr>
-          <tr><td>Making myself admin</td><td>Sign-up only accepts donor/recipient (tested). Unknown fields like <code>role</code> are rejected. The role is read from the database on every request.</td><td>auth.js · validation.js</td></tr>
-          <tr><td>IDOR<br><span class="muted">changing <code>/offers/5</code> to <code>/offers/6</code></span></td><td>Every change checks ownership: "is this offer yours?" → otherwise <b>403</b>. Pickup codes are only shown to the recipient and the owning donor.</td><td>changeOffer · changeReservation</td></tr>
-          <tr><td>Calling the API directly (Postman / curl)<br><span class="muted">skipping the website</span></td><td>That's fine: every rule lives on the server, not in React. Frontend checks only hide buttons.</td><td>routes/*.js</td></tr>
-          <tr><td>CSRF</td><td>We don't use cookies for login; the token travels in the <code>Authorization</code> header, which other sites can't make the browser add.</td><td>services/api.js</td></tr>
-          <tr><td>Clickjacking<br><span class="muted">our site inside a hidden iframe</span></td><td><code>X-Frame-Options: DENY</code> + CSP <code>frame-ancestors 'none'</code>.</td><td>security.js</td></tr>
-          <tr><td>Flooding / DoS</td><td>API rate limit (1000 requests / 15 min / IP), 100 KB max body, max 100 rows per page. Large-scale DDoS would need the host's protection (Cloudflare etc.).</td><td>app.js · validation.js</td></tr>
-          <tr><td>Finding which emails have accounts</td><td>Login says "Invalid email or password" for both cases and takes the same time (we run bcrypt even for unknown emails).</td><td>controllers/auth.js</td></tr>
-          <tr><td>Guessing a pickup code</td><td>Codes are 6 characters from 31 (~887 million options), from Node's <code>crypto</code>. Only the owning donor can submit one, and only for their own reservations.</td><td>reservations.js</td></tr>
-          <tr><td>"Your secret key is on GitHub"</td><td><code>.env</code> is git-ignored. An early commit had a key in the example file; we removed it and <b>rotated</b> the key, so the old one is useless. <code>npm run setup</code> generates a new random key per machine.</td><td>.gitignore · create-env.js</td></tr>
-          <tr><td>Sniffing traffic on Wi-Fi</td><td>The deployed site uses HTTPS (the host provides it), and we send HSTS. The database connection uses SSL.</td><td>security.js · config/db.js</td></tr>
-          <tr><td>Vulnerable libraries</td><td><code>npm audit</code>: 0 known vulnerabilities on both sides.</td><td>package.json</td></tr>
-          <tr><td>Huge / weird input<br><span class="muted">negative quantity, 1 MB title, bad dates</span></td><td>Every field is type- and length-checked (quantity must be a positive integer, title ≤ 200 chars, dates need a timezone). The database has CHECK constraints as a second layer.</td><td>validation.js · schema</td></tr>
-          <tr><td>Crashing the server</td><td>A central error handler returns clean JSON and never leaks stack traces; real details are only logged on the server.</td><td>app.js</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Honest limits (say these if pushed)</h3>
-    <div class="limits">
-      <div class="limit"><b>Signing out doesn't kill the token on the server.</b>A stolen token works until it expires (max 1 hour). Fix: short tokens + refresh tokens, or a revocation list.</div>
-      <div class="limit"><b>Rate limit is per IP and in memory.</b>A botnet with many IPs could guess slowly; restarting the server resets counts. Fix: per-account lockout, Redis-backed limits, CAPTCHA after failures.</div>
-      <div class="limit"><b>No email verification or password reset yet.</b>Someone could sign up with a fake email. Fix: verification emails (planned with the email feature).</div>
-      <div class="limit"><b>Token in sessionStorage.</b>Readable by JavaScript if an XSS ever got through. Mitigated by React + CSP; an httpOnly cookie would be stronger.</div>
-      <div class="limit"><b>Admin has no two-factor login.</b>Next step for the most powerful account.</div>
-    </div>
-  </section>
-
-  <section id="before" aria-labelledby="before-title">
-    <p class="eyebrow">The morning of</p>
-    <h2 id="before-title">Before you start</h2>
-    <div class="card">
-      <ol class="check">
-        <li>In the project folder: <code>npm run db:seed --prefix backend</code> (fresh demo offers)</li>
-        <li><code>npm start</code> → wait for "API running" → open <code>http://localhost:5173</code></li>
-        <li>Run <code>npm test</code> once, so you know it's green before showing it</li>
-        <li>If you use the live URL: open it a minute early (free hosts sleep)</li>
-        <li>Zoom the browser to ~125% so the room can read it</li>
-        <li>Have these files open in the editor: <code>routes/offers.js</code>, <code>controllers/reservations.js</code>, <code>middleware/auth.js</code></li>
-        <li>If a sign-in says "Too many attempts": stop and restart <code>npm start</code> (resets the counter)</li>
+<!-- 3. PLAN -->
+<section id="plan" aria-labelledby="plan-title">
+  <p class="eyebrow">Presentation</p>
+  <h2 id="plan-title">8 minutes, 3 presenters</h2>
+  <p>The brief asks for 5–8 minutes covering: <b>the problem</b>, <b>a live walkthrough</b>, <b>one technical challenge</b>, and <b>what you'd build next</b>.</p>
+  <div class="timeline" role="img" aria-label="Presenter 1: 0:00 to 2:15, Presenter 2: 2:15 to 5:15, Presenter 3: 5:15 to 8:00">
+    <div class="p1">Presenter 1<span>0:00–2:15</span></div>
+    <div class="p2">Presenter 2<span>2:15–5:15</span></div>
+    <div class="p3">Presenter 3<span>5:15–8:00</span></div>
+  </div>
+  <div class="grid3">
+    <article class="card presenter p1">
+      <h3>1 · Problem, users, architecture</h3>
+      <ol class="beats">
+        <li><span class="t">0:00</span><div>Problem<span class="say">"Restaurants throw away good food every evening while people nearby could use it."</span></div></li>
+        <li><span class="t">0:40</span><div>Three roles: donor, recipient, administrator (homepage).</div></li>
+        <li><span class="t">1:15</span><div>Architecture: React → Express REST API → PostgreSQL, 4 tables. Every request passes headers → rate limit → login check → role check (README diagram).</div></li>
       </ol>
+    </article>
+    <article class="card presenter p2">
+      <h3>2 · Live demo</h3>
+      <ol class="beats">
+        <li><span class="t">2:15</span><div>Donor demo → create "Leftover pizza", 4 portions.</div></li>
+        <li><span class="t">3:00</span><div>Recipient demo → filter → reserve 2 → <b>write down the code</b>.</div></li>
+        <li><span class="t">4:00</span><div>Donor demo → Reservations → type code → Confirm pickup.</div></li>
+        <li><span class="t">4:40</span><div>Admin demo → Moderation → resolve report, show Offers tab.</div></li>
+      </ol>
+    </article>
+    <article class="card presenter p3">
+      <h3>3 · Code, challenge, security, next</h3>
+      <ol class="beats">
+        <li><span class="t">5:15</span><div>Code layout: <code>routes/offers.js</code>.</div></li>
+        <li><span class="t">6:00</span><div><b>Challenge:</b> two people, last portion → transaction + <code>FOR UPDATE</code> in <code>createReservation</code>.</div></li>
+        <li><span class="t">6:50</span><div>Security summary + run <code>npm test</code> (19 tests, ~3 s).</div></li>
+        <li><span class="t">7:30</span><div>Next: email reminders, map, impact dashboard, 2FA for admins.</div></li>
+      </ol>
+    </article>
+  </div>
+  <h3>Before you start (morning of)</h3>
+  <ul class="steps">
+    <li><label><input type="checkbox" id="b1"><span><code>npm run db:seed --prefix backend</code> refreshes demo offers so their pickup windows are open</span></label></li>
+    <li><label><input type="checkbox" id="b2"><span><code>npm start</code> → wait for "API running" → open <code>http://localhost:5173</code></span></label></li>
+    <li><label><input type="checkbox" id="b3"><span><code>npm test</code> once, so you know it's green</span></label></li>
+    <li><label><input type="checkbox" id="b4"><span>Editor open on <code>routes/offers.js</code>, <code>controllers/reservations.js</code>, <code>middleware/auth.js</code></span></label></li>
+    <li><label><input type="checkbox" id="b5"><span>Browser zoom ~125% so the room can read it</span></label></li>
+  </ul>
+</section>
+
+<!-- 4. RUN -->
+<section id="run" aria-labelledby="run-title">
+  <p class="eyebrow">Setup</p>
+  <h2 id="run-title">How to run the project</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>First time</h3>
+      <p>Needs Node.js 20+ and PostgreSQL with a <code>shareaplate</code> database and <code>shareaplate_app</code> user.</p>
+<pre><code>npm run setup</code></pre>
+      <p class="muted">Creates <code>backend/.env</code> with a random <code>JWT_SECRET</code> (<code>backend/scripts/create-env.js</code>), installs both halves, runs migrations, seeds demo data. If the database step fails, put your password in <code>PGPASSWORD</code> in <code>backend/.env</code> and run again.</p>
     </div>
-  </section>
+    <div class="card">
+      <h3>Every time</h3>
+<pre><code>npm start</code></pre>
+      <p class="muted"><code>start.js</code> runs both: backend on <b>:5001</b> (<code>node --watch</code>, restarts on save) and frontend on <b>:5173</b> (Vite). <code>Ctrl + C</code> stops both. Port 5001, not 5000, because macOS AirPlay uses 5000.</p>
+    </div>
+    <div class="card">
+      <h3>Tests</h3>
+<pre><code>npm test</code></pre>
+      <p class="muted">Backend: <code>node --test</code>. Frontend: <code>vitest run</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Production / deploy</h3>
+<pre><code>npm run build
+npm run start:prod</code></pre>
+      <p class="muted">Build makes <code>frontend/dist</code>; start:prod runs migrations and starts Express, which serves both the site and <code>/api</code>. Env vars: <code>DATABASE_URL</code>, <code>JWT_SECRET</code>, <code>TRUST_PROXY=1</code>.</p>
+    </div>
+  </div>
+  <h3>If something goes wrong</h3>
+  <div class="table-wrap">
+    <table class="wide">
+      <thead><tr><th>Message</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>"Port 5001 is already in use"</td><td>Another copy is running. Stop it with <code>Ctrl + C</code> in its terminal, then <code>npm start</code>.</td></tr>
+        <tr><td>"Too many sign-in attempts"</td><td>Rate limit (20 per 15 min). Restart <code>npm start</code> to reset.</td></tr>
+        <tr><td>"Startup failed: password authentication failed"</td><td>Wrong <code>PGPASSWORD</code> in <code>backend/.env</code>.</td></tr>
+        <tr><td>"JWT_SECRET must contain at least 32 bytes"</td><td>Run <code>node backend/scripts/create-env.js</code> (only if <code>.env</code> is missing) or set it manually.</td></tr>
+        <tr><td>"Pickup requires … within its collection window"</td><td>The offer's pickup time hasn't started or has ended. Re-seed, or create an offer whose pickup starts now.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 
-  <section id="words" aria-labelledby="words-title">
-    <p class="eyebrow">Cheat sheet</p>
-    <h2 id="words-title">Glossary</h2>
-    <dl class="glossary">
-      <dt>Frontend / Backend</dt><dd>The website in the browser / the server and database behind it.</dd>
-      <dt>API, REST</dt><dd>The list of URLs the website can call; REST = resources + HTTP verbs + JSON.</dd>
-      <dt>Middleware</dt><dd>Code that runs before a route and can stop the request.</dd>
-      <dt>JWT</dt><dd>A signed "pass" proving who you are; expires after 1 hour.</dd>
-      <dt>Hashing (bcrypt)</dt><dd>One-way scrambling of passwords; slow on purpose.</dd>
-      <dt>Transaction</dt><dd>Several database changes that all succeed or all get undone.</dd>
-      <dt>Row lock (FOR UPDATE)</dt><dd>Makes other requests wait until we finish changing that row.</dd>
-      <dt>Rate limiting</dt><dd>Max requests per visitor per time window.</dd>
-      <dt>CSP</dt><dd>Content-Security-Policy: tells the browser which sources it may load scripts from.</dd>
-      <dt>IDOR</dt><dd>Changing an id in the URL to reach someone else's data.</dd>
-      <dt>Migration / Seed</dt><dd>SQL that creates tables / script that adds demo data.</dd>
-      <dt>Soft delete</dt><dd>Marking a row "removed" instead of erasing it, to keep history.</dd>
-    </dl>
-  </section>
+<!-- 5. USE -->
+<section id="use" aria-labelledby="use-title">
+  <p class="eyebrow">User guide</p>
+  <h2 id="use-title">How to use the website</h2>
+  <p>On the sign-in page, the <b>Donor demo / Recipient demo / Admin demo</b> buttons fill in the demo accounts. They only exist when running locally, never on the deployed site.</p>
+  <div class="grid3">
+    <div class="card"><h3>🧑‍🍳 Donor</h3><ol class="tight">
+      <li><b>My offers</b> → <b>Create an offer</b>: title, description, food type, area, pickup address, portions, pickup start and deadline.</li>
+      <li>Each card has <b>Reservations</b>, <b>Edit</b>, <b>Close</b> (no new reservations), <b>Remove</b> (cancels pending ones).</li>
+      <li><b>Reservations</b> page: type the recipient's code → <b>Confirm pickup</b>.</li>
+    </ol></div>
+    <div class="card"><h3>🙋 Recipient</h3><ol class="tight">
+      <li><b>Find food</b>: filter by area, food type, pickup time.</li>
+      <li>Open an offer → choose portions → <b>Reserve food</b> → a 6-character pickup code appears.</li>
+      <li><b>My reservations</b>: see codes, cancel before the deadline.</li>
+      <li><b>Report this offer</b> if something's wrong.</li>
+    </ol></div>
+    <div class="card"><h3>🛡️ Administrator</h3><ol class="tight">
+      <li><b>Moderation</b> → <b>Reports</b> tab: filter by status, <b>Resolve</b> or <b>Dismiss</b>.</li>
+      <li><b>Offers</b> tab: every offer of every donor; <b>Close</b> or <b>Remove offer</b>.</li>
+      <li>Admins can't sign up; accounts are created by the seed script.</li>
+    </ol></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Demo account</th><th>Email</th><th>Password</th></tr></thead>
+      <tbody>
+        <tr><td>Donor</td><td><code>donor@example.test</code></td><td><code>donor123@123</code></td></tr>
+        <tr><td>Recipient</td><td><code>recipient@example.test</code></td><td><code>recipient123@123</code></td></tr>
+        <tr><td>Admin</td><td><code>admin@example.test</code></td><td><code>admin123@123</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 
-  <footer>ShareAPlate · Capstone project by Samer Richani, Alfred Haber and Ziad Boutros.</footer>
+<!-- 6. ARCHITECTURE -->
+<section id="architecture" aria-labelledby="arch-title">
+  <p class="eyebrow">Big picture</p>
+  <h2 id="arch-title">Architecture</h2>
+  <div class="arch" role="img" aria-label="React website sends HTTP JSON requests to the Express API, which runs SQL against PostgreSQL">
+    <div class="box"><b>Website</b><span class="tech">React 19 · React Router · Vite</span><span class="muted">frontend/src — pages, components, one API client</span></div>
+    <div class="arrow">→<small>HTTP + JSON<br>Bearer token</small></div>
+    <div class="box"><b>API server</b><span class="tech">Node.js · Express 5</span><span class="muted">backend/src — routes, middleware, controllers</span></div>
+    <div class="arrow">→<small>SQL via pg<br>$1 placeholders</small></div>
+    <div class="box"><b>Database</b><span class="tech">PostgreSQL</span><span class="muted">users · offers · reservations · reports</span></div>
+  </div>
+  <h3>The life of one request</h3>
+  <div class="pipeline" aria-label="Request pipeline">
+    <span>securityHeaders</span><i>→</i><span>express.json (100 KB)</span><i>→</i><span>rateLimit</span><i>→</i><span>router</span><i>→</i><span>authenticate</span><i>→</i><span>authorize(role)</span><i>→</i><span>validateIdParam</span><i>→</i><span>controller</span><i>→</i><span>database</span><i>→</i><span>JSON reply</span>
+  </div>
+  <p class="muted">Errors at any step are thrown with <code>httpError(status, message)</code> and turned into JSON by the error handler at the end of <code>app.js</code>.</p>
+  <div class="grid2">
+    <div class="card"><h3>Development</h3><p>Two servers: Vite on :5173 serves React and <b>proxies</b> <code>/api</code> to Express on :5001 (<code>frontend/vite.config.js</code>). Same origin from the browser's view, so no CORS needed.</p></div>
+    <div class="card"><h3>Production</h3><p>One server: Express serves the built React files from <code>frontend/dist</code> and the API at <code>/api</code> (<code>app.js</code> lines 42–52). Hosted PostgreSQL via <code>DATABASE_URL</code> over SSL.</p></div>
+  </div>
+<pre><code>share-a-plate/
+├── package.json, start.js        ← npm run setup / start / test / build
+├── backend/
+│   ├── src/
+│   │   ├── server.js             ← starts the server, checks DB, shuts down cleanly
+│   │   ├── app.js                ← middleware order, routes, error handler
+│   │   ├── config/  db.js auth.js
+│   │   ├── middleware/  auth.js security.js
+│   │   ├── routes/  auth offers reservations admin
+│   │   ├── controllers/  auth offers reservations reports admin
+│   │   └── utils/  httpError.js validation.js
+│   ├── db/  migrate.js seed.js migrations/001_initial_schema.sql
+│   ├── scripts/create-env.js
+│   └── test/  api · rate-limit · validation
+├── frontend/
+│   ├── index.html, vite.config.js
+│   └── src/
+│       ├── main.jsx              ← mounts React, router, AuthProvider, fonts, CSS
+│       ├── app/App.jsx           ← all routes + guards
+│       ├── pages/  10 pages
+│       ├── components/  OfferCard OfferForm SiteHeader … ui/
+│       ├── context/ AuthContext.jsx   hooks/ useAuth.js
+│       ├── services/api.js       utils/format.js
+│       ├── styles/global.css     tests/
+└── docs/  DEPLOYMENT.md DEVELOPMENT.md PRESENTATION.html</code></pre>
+</section>
+
+<!-- 7. DATABASE -->
+<section id="database" aria-labelledby="db-title">
+  <p class="eyebrow">PostgreSQL</p>
+  <h2 id="db-title">Database</h2>
+  <p>Defined in <code>backend/db/migrations/001_initial_schema.sql</code>. The database enforces rules too, as a second safety net behind the API.</p>
+  <div class="tables">
+    <div class="dbt"><h4>users</h4><ul>
+      <li><span>id</span><span>PK, identity</span></li><li><span>name</span><span>not blank</span></li><li><span>email</span><span>UNIQUE, lowercase</span></li><li><span>password_hash</span><span>bcrypt</span></li><li><span>role</span><span>donor | recipient | administrator</span></li><li><span>created_at</span><span>timestamptz</span></li></ul>
+      <p class="rule">CHECK on role values; email must be trimmed and lowercase.</p></div>
+    <div class="dbt"><h4>offers</h4><ul>
+      <li><span>id</span><span>PK</span></li><li><span>donor_id</span><span>FK → users</span></li><li><span>title, description</span><span>text</span></li><li><span>category, area</span><span>lowercase</span></li><li><span>location</span><span>pickup address</span></li><li><span>quantity</span><span>&gt; 0</span></li><li><span>remaining_quantity</span><span>0 … quantity</span></li><li><span>pickup_start, pickup_deadline</span><span>deadline &gt; start</span></li><li><span>status</span><span>active | closed | removed</span></li></ul>
+      <p class="rule">Partial index for browsing active offers by area, category, deadline.</p></div>
+    <div class="dbt"><h4>reservations</h4><ul>
+      <li><span>id</span><span>PK</span></li><li><span>offer_id</span><span>FK → offers</span></li><li><span>recipient_id</span><span>FK → users</span></li><li><span>quantity</span><span>&gt; 0</span></li><li><span>pickup_code</span><span>UNIQUE</span></li><li><span>status</span><span>reserved | collected | cancelled | expired</span></li></ul>
+      <p class="rule">Unique partial index: only <b>one pending</b> reservation per recipient per offer.</p></div>
+    <div class="dbt"><h4>reports</h4><ul>
+      <li><span>id</span><span>PK</span></li><li><span>reporter_id</span><span>FK → users</span></li><li><span>offer_id</span><span>FK → offers</span></li><li><span>reason</span><span>not blank</span></li><li><span>status</span><span>open | resolved | dismissed</span></li></ul>
+      <p class="rule">Foreign keys don't cascade: history is never silently deleted.</p></div>
+  </div>
+  <h3>Relationships</h3>
+  <p>One <b>user (donor)</b> has many <b>offers</b>. One <b>offer</b> has many <b>reservations</b> and many <b>reports</b>. One <b>user (recipient)</b> has many <b>reservations</b>. One <b>user</b> can file many <b>reports</b>.</p>
+  <h3>Status lifecycles</h3>
+  <div class="card">
+    <div class="lifecycle"><span class="muted">Offer:</span> <b>active</b><i>→</i><b>closed</b> <span class="muted">(no new reservations)</span> <i>→</i><b>removed</b> <span class="muted">(soft delete)</span></div>
+    <div class="lifecycle"><span class="muted">Reservation:</span> <b>reserved</b><i>→</i><b>collected</b> <span class="muted">or</span> <b>cancelled</b> <span class="muted">or</span> <b>expired</b> <span class="muted">(after deadline)</span></div>
+    <div class="lifecycle"><span class="muted">Report:</span> <b>open</b><i>→</i><b>resolved</b> <span class="muted">or</span> <b>dismissed</b></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Migrations</h3><p><code>db/migrate.js</code> creates a <code>schema_migrations</code> table, runs every <code>.sql</code> file in <code>migrations/</code> in order <b>once</b>, inside a transaction, and records its name. To change the schema, add <code>002_….sql</code>; never edit an applied file.</p></div>
+    <div class="card"><h3>Seed</h3><p><code>db/seed.js</code> creates or updates the 3 demo accounts from <code>.env</code> (<code>seedUser</code>, line 63) and 5 demo offers (<code>seedDemoOffers</code>, line 96). Pickup windows open 1 hour before seeding; re-seeding refreshes them.</p></div>
+  </div>
+</section>
+
+<!-- 8. BACKEND -->
+<section id="backend" aria-labelledby="be-title">
+  <p class="eyebrow">Express</p>
+  <h2 id="be-title">Backend, file by file</h2>
+  <div class="files">
+    <div class="file"><span class="path">src/server.js</span><p>Loads <code>.env</code>, checks the database with <code>SELECT 1</code>, starts listening on <code>PORT</code>, explains a busy port, closes the server and DB pool on Ctrl+C.</p></div>
+    <div class="file"><span class="path">src/app.js</span><p>The middleware order: security headers (18) → JSON body ≤100 KB (21) → rate limits (25–30) → 4 routers (33–36) → API 404 (39) → serve built website (42–52) → error handler (55).</p></div>
+    <div class="file"><span class="path">src/config/db.js</span><p>PostgreSQL connection pool (max 10). <code>withTransaction(work)</code> (23): BEGIN → work → COMMIT, or ROLLBACK on any error, always releases the connection.</p></div>
+    <div class="file"><span class="path">src/config/auth.js</span><p>Reads <code>JWT_SECRET</code>; refuses to start if it's missing or under 32 bytes.</p></div>
+    <div class="file"><span class="path">src/middleware/auth.js</span><p><code>authenticate</code> (11): Bearer token → <code>jwt.verify</code> (HS256 only) → load user from DB → <code>req.user</code>. <code>authorize(...roles)</code> (39): 403 if role not allowed.</p></div>
+    <div class="file"><span class="path">src/middleware/security.js</span><p><code>securityHeaders</code> (4): CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, HSTS on HTTPS. <code>rateLimit</code> (25): per-IP counter in a <code>Map</code>, 429 + Retry-After.</p></div>
+    <div class="file"><span class="path">src/routes/*.js</span><p>URL → role → controller. <code>router.use(authenticate)</code> protects the whole file; <code>router.param('id', validateIdParam)</code> checks every <code>:id</code>.</p></div>
+    <div class="file"><span class="path">src/controllers/auth.js</span><p><code>register</code> (34), <code>login</code> (67), <code>getMe</code> (89). bcrypt cost 12, <code>FAKE_HASH</code> for constant timing, <code>createToken</code> (24), <code>publicUser</code> never returns the hash.</p></div>
+    <div class="file"><span class="path">src/controllers/offers.js</span><p><code>cleanOfferData</code> (12) validates fields; <code>listOffers</code> (41) with filters + pagination; <code>getOffer</code> (92) with visibility rules; <code>createOffer</code> (108); <code>changeOffer</code> (126) lock + ownership; <code>updateOffer</code> (143); <code>removeOffer</code> (191); <code>moderateOffer</code> (219).</p></div>
+    <div class="file"><span class="path">src/controllers/reservations.js</span><p><code>makePickupCode</code> (13); <code>createReservation</code> (20) the locked transaction; <code>listReservations</code> (55); <code>changeReservation</code> (82) lock order; <code>cancelReservation</code> (94); <code>confirmPickup</code> (111).</p></div>
+    <div class="file"><span class="path">src/controllers/reports.js</span><p><code>createReport</code> (8): inserts only if the offer exists (<code>INSERT … SELECT</code>).</p></div>
+    <div class="file"><span class="path">src/controllers/admin.js</span><p><code>listReports</code> (12), <code>listOffers</code> (28) with status filter; <code>updateReport</code> (44): only an open report can change.</p></div>
+    <div class="file"><span class="path">src/utils/httpError.js</span><p>Throws an Error with a <code>status</code>; the error handler sends it as JSON.</p></div>
+    <div class="file"><span class="path">src/utils/validation.js</span><p><code>isPositiveInteger</code>, <code>isNonEmptyString</code>, <code>isEmail</code>, <code>allowOnlyFields</code> (24, blocks mass assignment), <code>validateIdParam</code> (32), <code>readPagination</code> (41, limit ≤ 100), <code>parseTimestamp</code> (51).</p></div>
+    <div class="file"><span class="path">test/*.test.js</span><p>Start the real app on a random port and send real HTTP requests (no database needed for these).</p></div>
+  </div>
+</section>
+
+<!-- 9. FRONTEND -->
+<section id="frontend" aria-labelledby="fe-title">
+  <p class="eyebrow">React</p>
+  <h2 id="fe-title">Frontend, file by file</h2>
+  <div class="files">
+    <div class="file"><span class="path">main.jsx</span><p>Mounts <code>&lt;App/&gt;</code> inside <code>&lt;BrowserRouter&gt;</code> and <code>&lt;AuthProvider&gt;</code>; imports bundled fonts and the stylesheet.</p></div>
+    <div class="file"><span class="path">app/App.jsx</span><p>All routes. <code>RequireAuth</code> (24) → /login if signed out; <code>RoleRoute</code> (35) → /offers if wrong role. Shows the "session expired" notice.</p></div>
+    <div class="file"><span class="path">context/AuthContext.jsx</span><p>Holds <code>user</code>; <code>login</code> (52), <code>register</code> (63), <code>logout</code>; saves the user in sessionStorage (<code>readStoredUser</code>, 12); listens for <code>shareaplate:session-expired</code> (35).</p></div>
+    <div class="file"><span class="path">hooks/useAuth.js</span><p><code>useContext(AuthContext)</code> with a clear error if used outside the provider.</p></div>
+    <div class="file"><span class="path">services/api.js</span><p><code>request()</code> (40): adds <code>Authorization: Bearer</code>, JSON body, friendly network error, <code>ApiError</code> with status; on 401 clears the token and fires the expired event (71). Token kept in sessionStorage (8, 30).</p></div>
+    <div class="file"><span class="path">pages/LandingPage.jsx</span><p>Public homepage: hero, how it works, who it's for.</p></div>
+    <div class="file"><span class="path">pages/LoginPage.jsx · RegisterPage.jsx</span><p>Controlled forms → <code>login</code> / <code>register</code>. Demo buttons only when <code>import.meta.env.DEV</code> (11).</p></div>
+    <div class="file"><span class="path">pages/OffersPage.jsx</span><p>Filter form + results. <code>useEffect</code> (30) fetches whenever applied filters or page change, with <code>AbortController</code>.</p></div>
+    <div class="file"><span class="path">pages/OfferDetailPage.jsx</span><p>Loads one offer (28). <code>reserve</code> (53), <code>reportOffer</code> (73). Shows the pickup code after reserving. <code>OfferDetailRoute</code> (290) uses <code>key={offerId}</code> to reset state per offer.</p></div>
+    <div class="file"><span class="path">pages/MyOffersPage.jsx</span><p>Donor's offers; <code>changeStatus</code> (47) closes or removes after a confirm dialog.</p></div>
+    <div class="file"><span class="path">pages/OfferFormPage.jsx + components/OfferForm.jsx</span><p>Create or edit (same form). <code>save</code> (40) POST or PATCH; <code>OfferForm.submit</code> (24) checks dates and converts local time → ISO.</p></div>
+    <div class="file"><span class="path">pages/OfferReservationsPage.jsx</span><p>Donor sees reservations of one offer; <code>confirmPickup</code> (50) sends the typed code.</p></div>
+    <div class="file"><span class="path">pages/MyReservationsPage.jsx</span><p>Recipient's reservations and codes; <code>cancelReservation</code> (47).</p></div>
+    <div class="file"><span class="path">pages/AdminPage.jsx</span><p>Two keyboard-accessible tabs; <code>loadRecords</code> (29) fetches reports or offers by status; <code>updateReport</code> (59), <code>moderateOffer</code> (79).</p></div>
+    <div class="file"><span class="path">components/</span><p><code>SiteHeader</code> (role-based nav), <code>OfferCard</code> (category icon, portions bar, status), <code>Pagination</code>, <code>PageHeading</code>, <code>AppFooter</code>; <code>ui/</code>: <code>Button</code> (renders Link, a or button), <code>TextField</code>, <code>Alert</code>, <code>StatusBadge</code>, <code>EmptyState</code>, <code>LoadingIndicator</code>.</p></div>
+    <div class="file"><span class="path">utils/format.js</span><p>Date formatting and <code>datetime-local</code> ↔ ISO conversion; status labels; error messages.</p></div>
+    <div class="file"><span class="path">styles/global.css</span><p>Design tokens on <code>:root</code> (colours, fonts, radius), components, then responsive rules at 900 / 700 / 400 px and reduced-motion.</p></div>
+    <div class="file"><span class="path">tests/</span><p>Vitest + Testing Library in jsdom: OfferCard, XSS as text, redirect to sign-in, date utils.</p></div>
+  </div>
+</section>
+
+<!-- 10. FEATURES -->
+<section id="features" aria-labelledby="feat-title">
+  <p class="eyebrow">"How did you do this feature?"</p>
+  <h2 id="feat-title">How we built each feature</h2>
+  <p>Each trail goes from what the user clicks, through the API, to the database. Line numbers are where the function starts. Paths start at <code>frontend/src/</code> or <code>backend/src/</code>.</p>
+
+  <article class="feature" id="f-register"><header><h3>Sign up</h3><span class="pill ok">POST /api/auth/register</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/RegisterPage.jsx:26 submit</span><p>Controlled form (name, email, password, donor/recipient). Calls <code>register(values)</code> from the auth context.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">context/AuthContext.jsx:63 register</span><p><code>api.post('/auth/register')</code>, then stores the token (<code>setAccessToken</code>) and user (<code>setUser</code>).</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">routes/auth.js:6 → controllers/auth.js:34 register</span><p>Validates: name ≤ 100, email shape, password 12+ chars (≤ 72 bytes), role must be donor or recipient. Hashes with <code>bcrypt.hash(password, 12)</code>.</p></div></li>
+    <li><div><span class="layer">Database</span><span class="loc">INSERT … ON CONFLICT (email) DO NOTHING RETURNING …</span><p>If no row comes back, the email exists → <b>409</b>. Otherwise → <b>201</b> with a token from <code>createToken</code> (line 24) and the public user.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-login"><header><h3>Sign in</h3><span class="pill ok">POST /api/auth/login</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/LoginPage.jsx:37 submit</span><p>Calls <code>login(values)</code>, then navigates to the page you came from (<code>location.state.from</code>) or <code>/offers</code>.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">context/AuthContext.jsx:52 login</span><p>Posts credentials; saves token and user.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">app.js:29 loginLimit → controllers/auth.js:67 login</span><p>Max 20 attempts / 15 min per IP. Finds user by lowercase email, runs <code>bcrypt.compare</code> (with <code>FAKE_HASH</code> if the email doesn't exist, so timing is equal). Same message for both failures → <b>401</b>.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/auth.js:24 createToken</span><p><code>jwt.sign({}, secret, { algorithm: 'HS256', subject: user.id, expiresIn: '1h' })</code>.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-protect"><header><h3>Protected routes &amp; roles</h3><span class="pill ok">every request</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">app/App.jsx:24 RequireAuth · :35 RoleRoute</span><p>Redirect to <code>/login</code> if signed out, to <code>/offers</code> if wrong role. This is UX only.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">services/api.js:40 request</span><p>Adds <code>Authorization: Bearer &lt;token&gt;</code> to every call.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">middleware/auth.js:11 authenticate</span><p>Parses the header with a regex, <code>jwt.verify(token, secret, { algorithms: ['HS256'] })</code>, checks <code>sub</code> is a positive integer and <code>exp</code> exists, loads <code>id, name, email, role</code> from the DB → <code>req.user</code>. Any failure → <b>401</b>.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">middleware/auth.js:39 authorize(...roles)</span><p>Used in routes, e.g. <code>routes/offers.js:21 authorize('donor')</code>. Wrong role → <b>403</b>.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-session"><header><h3>Stay signed in after refresh / session expiry</h3><span class="pill ok">frontend</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">services/api.js:8 readStoredToken · :30 setAccessToken</span><p>Token saved in <code>sessionStorage</code>; read back when the page loads. Wrapped in try/catch in case storage is blocked.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">context/AuthContext.jsx:12 readStoredUser</span><p>Restores the user only if a token also exists. <code>useState(readStoredUser)</code> = lazy initial state.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">services/api.js:71 → AuthContext.jsx:35</span><p>On a 401, the token is cleared and a <code>shareaplate:session-expired</code> window event fires; the context listens, signs out and shows "Your session expired".</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-browse"><header><h3>Browse &amp; filter offers, pagination</h3><span class="pill ok">GET /api/offers</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/OffersPage.jsx:67 applyFilters · :30 useEffect</span><p>Form state is separate from <code>applied</code> filters. The effect builds <code>URLSearchParams</code> (page, limit=12, area, category, pickup_from/to as ISO) and refetches when <code>applied</code> or <code>page</code> change; cleanup aborts the old request.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">components/Pagination.jsx</span><p>"Next" is enabled when a full page came back (<code>offers.length === limit</code>).</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/offers.js:41 listOffers</span><p>Builds a <code>conditions[]</code> list and a <code>values[]</code> list: public view = active, portions &gt; 0, deadline in future. Each filter pushes a value and adds <code>column = $n</code>. Column names come from our fixed list only.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">utils/validation.js:41 readPagination</span><p>page ≥ 1, limit 1–100 → <code>LIMIT $x OFFSET $y</code>.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-create"><header><h3>Create &amp; edit an offer</h3><span class="pill ok">POST / PATCH /api/offers</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">components/OfferForm.jsx:24 submit</span><p>One form for create and edit. Checks deadline &gt; start, converts <code>datetime-local</code> to ISO with timezone (<code>utils/format.js fromDateTimeLocal</code>), quantity to a number.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/OfferFormPage.jsx:40 save</span><p><code>editing</code> prop decides: <code>api.patch('/offers/:id')</code> or <code>api.post('/offers')</code>. Edit mode first loads the offer (line 18).</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/offers.js:108 createOffer</span><p><code>allowOnlyFields</code> rejects unknown keys (e.g. <code>donor_id</code>), <code>cleanOfferData</code> (12) trims, lowercases area/category, checks lengths, quantity and dates. <code>donor_id</code> always comes from <code>req.user.id</code>, never the body.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/offers.js:143 updateOffer</span><p>Inside <code>changeOffer</code> (lock + owner check). Can't edit removed/expired offers; can't lower quantity below committed portions; can't move place/time once someone reserved. <code>remaining = new quantity − committed</code>.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-remove"><header><h3>Close / remove an offer</h3><span class="pill ok">PATCH status / DELETE</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/MyOffersPage.jsx:47 changeStatus</span><p>Confirm dialog, then <code>api.delete</code> (remove) or <code>api.patch({ status: 'closed' })</code>, then reload the list.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/offers.js:126 changeOffer</span><p>Transaction, <code>SELECT … FOR UPDATE</code>, 404 if missing, 403 if not owner (and not admin).</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/offers.js:191 removeOffer</span><p>Soft delete: pending reservations → cancelled (or expired if past deadline), their portions added back, offer status → <code>removed</code>. Collected reservations stay as history.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-reserve"><header><h3>Reserve portions (the technical challenge)</h3><span class="pill ok">POST /api/offers/:id/reservations</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/OfferDetailPage.jsx:53 reserve</span><p>Posts <code>{ quantity: Number(quantity) }</code>, shows the returned code, refetches the offer to update portions left. The button only shows when <code>canReserve</code> is true.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">routes/offers.js:24 authorize('recipient')</span><p>Only recipients.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/reservations.js:20 createReservation</span><p>Validates quantity, then <code>withTransaction</code>: <code>SELECT * FROM offers WHERE id=$1 FOR UPDATE</code> (row lock) → checks active, not expired, enough portions, no existing pending reservation → INSERT with <code>makePickupCode()</code> → <code>remaining_quantity − quantity</code> → COMMIT. Returns <b>201</b>.</p></div></li>
+    <li><div><span class="layer">Database</span><span class="loc">config/db.js:23 withTransaction · schema CHECKs</span><p>Concurrent requests wait on the lock and then see the updated count. CHECK <code>remaining_quantity BETWEEN 0 AND quantity</code> and the unique partial index are backups.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-pickup"><header><h3>Pickup code &amp; confirm pickup</h3><span class="pill ok">POST /api/reservations/:id/pickup</span></header><ol class="trail">
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/reservations.js:13 makePickupCode</span><p>6 characters from <code>ABCDEFGHJKMNPQRSTUVWXYZ23456789</code> (no 0/O, 1/I/L) using <code>crypto.randomInt</code>, which is unpredictable, unlike <code>Math.random</code>.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/OfferReservationsPage.jsx:50 confirmPickup</span><p>Donor types the code (auto-uppercased) and submits.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/reservations.js:111 confirmPickup</span><p><code>changeReservation</code> (82) locks offer then reservation. Must be the offer's donor (403), code must match ignoring case (400), must be pending and within the pickup window (409). Sets <code>collected</code>.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-cancel"><header><h3>Cancel a reservation</h3><span class="pill ok">POST /api/reservations/:id/cancel</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/MyReservationsPage.jsx:47 cancelReservation</span><p>Calls the API and reloads the list.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/reservations.js:94 cancelReservation</span><p>Only your own (403), only pending and before the deadline (409). Status → cancelled, portions given back to the offer, in one transaction. Cancelling twice is harmless (returns the same result).</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-report"><header><h3>Report an offer</h3><span class="pill ok">POST /api/offers/:id/reports</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/OfferDetailPage.jsx:73 reportOffer</span><p>"Report this offer" opens a reason box; on success shows a thank-you message.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/reports.js:8 createReport</span><p>Reason 1–2000 chars, no other fields. <code>INSERT INTO reports … SELECT $1, id, $2 FROM offers WHERE id = $3</code>: no row inserted means the offer doesn't exist → 404.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-admin"><header><h3>Admin moderation</h3><span class="pill ok">/api/admin/*</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">pages/AdminPage.jsx:29 loadRecords · :59 updateReport · :79 moderateOffer</span><p>Tabs (Reports / Offers) with a status filter and pagination; buttons call PATCH.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">routes/admin.js:8</span><p><code>router.use(authenticate, authorize('administrator'))</code> protects every admin URL at once.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">controllers/admin.js:44 updateReport · offers.js:219 moderateOffer</span><p>Reports: only open → resolved/dismissed (409 otherwise). Offers: closed or removed, reusing <code>removeOffer</code>; <code>changeOffer</code> lets admins through the ownership check.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-errors"><header><h3>Validation &amp; error handling</h3><span class="pill ok">everywhere</span></header><ol class="trail">
+    <li><div><span class="layer">Backend</span><span class="loc">utils/validation.js · utils/httpError.js:6</span><p>Controllers call <code>httpError(400, 'Invalid title.')</code>, which throws. Express 5 catches errors thrown in async handlers automatically.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">app.js:55 error handler</span><p>Bad JSON → 400, too large → 413, our own 4xx → that status + message, anything else → logged, generic <b>500</b> (no stack trace to the user).</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">services/api.js:40 request · ui/Alert.jsx</span><p>Non-OK responses become <code>ApiError(message, status)</code>; pages catch it and show an <code>Alert</code>. Network failures show "Unable to reach ShareAPlate".</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-sec"><header><h3>Rate limiting &amp; security headers</h3><span class="pill ok">middleware</span></header><ol class="trail">
+    <li><div><span class="layer">Backend</span><span class="loc">middleware/security.js:25 rateLimit</span><p>A <code>Map</code> of ip → { count, resetAt }. Over the max → <b>429</b> with <code>Retry-After</code>. Old entries are pruned.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">app.js:25–30</span><p>1000 requests / 15 min for <code>/api</code>; 20 / 15 min for login and register.</p></div></li>
+    <li><div><span class="layer">Backend</span><span class="loc">middleware/security.js:4 securityHeaders</span><p>CSP <code>default-src 'self'</code>, <code>frame-ancestors 'none'</code>, <code>X-Frame-Options: DENY</code>, <code>nosniff</code>, <code>no-referrer</code>, Permissions-Policy, HSTS. <code>app.disable('x-powered-by')</code>.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-tests"><header><h3>Automated tests</h3><span class="pill ok">npm test</span></header><ol class="trail">
+    <li><div><span class="layer">Backend</span><span class="loc">backend/test/helpers.js · api.test.js · rate-limit.test.js · validation.test.js</span><p><code>app.listen(0)</code> on a random port; real <code>fetch</code> calls. Checks: 401 without token, forged token, <code>alg:none</code>, no admin sign-up, short password, bad JSON, 413, headers, 429, validation helpers.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">frontend/src/tests/*.test.jsx · vite.config.js test block</span><p>Vitest with jsdom; Testing Library renders components and queries by role/text, as a user would. XSS test: a title with <code>&lt;img onerror&gt;</code> renders as text, no <code>img</code> element.</p></div></li>
+  </ol></article>
+
+  <article class="feature" id="f-responsive"><header><h3>Responsive design</h3><span class="pill ok">CSS</span></header><ol class="trail">
+    <li><div><span class="layer">Frontend</span><span class="loc">styles/global.css :root tokens</span><p>Colours, fonts, radius as CSS variables, so the whole look changes in one place.</p></div></li>
+    <li><div><span class="layer">Frontend</span><span class="loc">styles/global.css @media (width ≤ 900 / 700 / 400px)</span><p>Grids go from 3 columns to 1, the header wraps, forms stack. <code>index.html</code> has the viewport meta tag.</p></div></li>
+  </ol></article>
+</section>
+
+<!-- 11. WHY -->
+<section id="why" aria-labelledby="why-title">
+  <p class="eyebrow">Design decisions</p>
+  <h2 id="why-title">Why we did it this way</h2>
+  <div class="grid2">
+    <div class="card"><h3>PostgreSQL, not MongoDB</h3><p>Our data is relational (users → offers → reservations). We need foreign keys, CHECK constraints and transactions with row locks for safe reservations.</p></div>
+    <div class="card"><h3>Raw SQL with <code>pg</code>, not an ORM</h3><p>Every query is visible and easy to explain; parameterised queries give the same SQL-injection protection; fewer layers for a project this size.</p></div>
+    <div class="card"><h3>JWT, not server sessions</h3><p>Stateless: no session store; works the same in dev (two servers) and production. Short expiry (1 h) limits damage if one leaks. Role is re-read from the DB on each request.</p></div>
+    <div class="card"><h3>Token in a header, not a cookie</h3><p>Browsers never attach headers automatically, so CSRF attacks don't apply. Trade-off: JavaScript can read sessionStorage, so we rely on React escaping + CSP against XSS.</p></div>
+    <div class="card"><h3>routes → controllers → utils</h3><p>Separation of concerns: routes say <i>who</i> can call <i>what</i>; controllers hold business rules; utils are reusable checks. Easy to find and test.</p></div>
+    <div class="card"><h3>Soft delete</h3><p>Offers are marked <code>removed</code>, not deleted, so reservation and report history stays consistent (foreign keys don't cascade).</p></div>
+    <div class="card"><h3>Short human-friendly pickup codes</h3><p>6 characters is easy to read aloud; look-alike characters removed; generated with crypto. Only the owning donor can submit one, so guessing isn't practical.</p></div>
+    <div class="card"><h3>One service in production</h3><p>Express serves the built site and the API: one URL, no CORS, one thing to deploy.</p></div>
+    <div class="card"><h3>Server is the source of truth</h3><p>The frontend hides buttons for convenience; every rule (role, owner, quantity, times) is enforced again on the server, and again by DB constraints.</p></div>
+    <div class="card"><h3>Vite + plain CSS</h3><p>Fast dev server, simple build; CSS variables give a consistent design without a UI library to learn.</p></div>
+  </div>
+</section>
+
+<!-- 12. SECURITY -->
+<section id="security" aria-labelledby="sec-title">
+  <p class="eyebrow">"How would I hack your website?"</p>
+  <h2 id="sec-title">Security</h2>
+  <p>Answer in three parts: <b>the attack</b>, <b>what stops it</b>, <b>where in the code</b>. Admitting a known limit beats bluffing.</p>
+  <div class="table-wrap">
+    <table class="wide">
+      <thead><tr><th>Attack</th><th>What stops it</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td><b>SQL injection</b><br><span class="muted"><code>' OR 1=1 --</code></span></td><td>All values go through <code>$1, $2</code> placeholders; the DB never runs them as SQL. Dynamic parts (column names) come from fixed lists.</td><td><span class="where">controllers/*.js · offers.js:41</span></td></tr>
+        <tr><td><b>XSS</b><br><span class="muted">offer titled <code>&lt;script&gt;</code></span></td><td>React escapes text; no <code>dangerouslySetInnerHTML</code>. CSP only allows our own scripts. Tested.</td><td><span class="where">security.js:4 · OfferCard.test.jsx</span></td></tr>
+        <tr><td><b>Brute-force passwords</b></td><td>20 attempts / 15 min / IP → 429; bcrypt is slow; 12+ character passwords.</td><td><span class="where">app.js:26 · security.js:25</span></td></tr>
+        <tr><td><b>Stolen database</b></td><td>Only salted bcrypt hashes (cost 12). No plain passwords anywhere.</td><td><span class="where">controllers/auth.js:11</span></td></tr>
+        <tr><td><b>Forged / edited token</b></td><td>HS256 signature with a 64-byte secret; <code>alg: none</code> rejected; expiry checked. Tested.</td><td><span class="where">middleware/auth.js:11 · api.test.js</span></td></tr>
+        <tr><td><b>Privilege escalation</b><br><span class="muted">"make me admin"</span></td><td>Sign-up only allows donor/recipient (tested); unknown fields rejected; role read from DB.</td><td><span class="where">auth.js:34 · validation.js:24</span></td></tr>
+        <tr><td><b>IDOR</b><br><span class="muted">change the id in the URL</span></td><td>Ownership checked on every change; reservations of an offer only for its donor.</td><td><span class="where">offers.js:126 · reservations.js:55, 94, 111</span></td></tr>
+        <tr><td><b>Mass assignment</b><br><span class="muted">sending <code>donor_id</code>, <code>status</code></span></td><td><code>allowOnlyFields</code> whitelist → 400; <code>donor_id</code> taken from the token.</td><td><span class="where">validation.js:24 · offers.js:108</span></td></tr>
+        <tr><td><b>Skip the website</b> (Postman/curl)</td><td>Fine: all rules are on the server.</td><td><span class="where">routes/*.js</span></td></tr>
+        <tr><td><b>CSRF</b></td><td>No auth cookies; token is in the <code>Authorization</code> header, which other sites can't make the browser send.</td><td><span class="where">services/api.js:40</span></td></tr>
+        <tr><td><b>Clickjacking</b></td><td><code>X-Frame-Options: DENY</code>, CSP <code>frame-ancestors 'none'</code>.</td><td><span class="where">security.js:4</span></td></tr>
+        <tr><td><b>DoS / flooding</b></td><td>API rate limit, 100 KB body limit (tested), max 100 rows per page. Big DDoS needs host-level protection.</td><td><span class="where">app.js:21, 25 · validation.js:41</span></td></tr>
+        <tr><td><b>Email enumeration</b></td><td>Same message and same timing for unknown email and wrong password (<code>FAKE_HASH</code>). Register does reveal "email already registered", a usability trade-off.</td><td><span class="where">auth.js:15, 67</span></td></tr>
+        <tr><td><b>Guess a pickup code</b></td><td>31⁶ ≈ 887 million codes from crypto; only the owning donor can submit; API rate limit.</td><td><span class="where">reservations.js:13, 111</span></td></tr>
+        <tr><td><b>Secrets on GitHub</b></td><td><code>.env</code> is git-ignored. An early commit had the key in the example file; we removed it and <b>rotated</b> the key, so the old one is useless. Setup generates a new key per machine.</td><td><span class="where">.gitignore · scripts/create-env.js</span></td></tr>
+        <tr><td><b>Wi-Fi sniffing</b></td><td>HTTPS on the host + HSTS header; DB connection over SSL with certificate checks.</td><td><span class="where">security.js · config/db.js</span></td></tr>
+        <tr><td><b>Vulnerable packages</b></td><td><code>npm audit</code>: 0 known vulnerabilities, frontend and backend.</td><td><span class="where">package.json</span></td></tr>
+        <tr><td><b>Weird input</b><br><span class="muted">−5 portions, 1 MB title, bad dates, <code>/offers/abc</code></span></td><td>Type, length and range checks; IDs must be positive integers; DB CHECK constraints as a second layer.</td><td><span class="where">validation.js · schema</span></td></tr>
+        <tr><td><b>Crash the server / read errors</b></td><td>Central error handler; generic 500, details only in server logs.</td><td><span class="where">app.js:55</span></td></tr>
+        <tr><td><b>Demo admin button on the live site</b></td><td>Demo buttons are compiled out of production builds (<code>import.meta.env.DEV</code>); production accounts use different passwords.</td><td><span class="where">LoginPage.jsx:11</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Honest limits (say these if pushed)</h3>
+  <div class="limits">
+    <div class="limit"><b>Signing out doesn't revoke the token.</b>A stolen token works until it expires (≤ 1 h). Fix: short access tokens + refresh tokens, or a deny-list.</div>
+    <div class="limit"><b>Rate limit is per IP and in memory.</b>Many IPs (botnet) could guess slowly; a restart resets counts; a whole class behind one Wi-Fi IP shares the limit. Fix: per-account lockout, Redis store, CAPTCHA.</div>
+    <div class="limit"><b>No email verification or password reset.</b>Fake emails can sign up. Planned with the email feature.</div>
+    <div class="limit"><b>Token in sessionStorage.</b>Readable by JS if XSS ever got through. An httpOnly cookie + CSRF token would be stronger.</div>
+    <div class="limit"><b>No 2FA for admins, no audit log</b> of who removed what.</div>
+  </div>
+</section>
+
+<!-- 13. QUESTIONS -->
+<section id="questions" aria-labelledby="q-title">
+  <p class="eyebrow">Practice</p>
+  <h2 id="q-title">Coding questions &amp; answers</h2>
+  <div class="qa-tools">
+    <label for="q-search" class="muted" style="font-size:0.85rem">Search questions and answers</label>
+    <input id="q-search" type="search" placeholder="e.g. transaction, JWT, useEffect, 403">
+    <div class="chips" role="group" aria-label="Filter by topic">
+      <button type="button" data-topic="all" aria-pressed="true">All</button>
+      <button type="button" data-topic="react" aria-pressed="false">React</button>
+      <button type="button" data-topic="express" aria-pressed="false">Express &amp; API</button>
+      <button type="button" data-topic="db" aria-pressed="false">Database</button>
+      <button type="button" data-topic="auth" aria-pressed="false">Auth</button>
+      <button type="button" data-topic="security" aria-pressed="false">Security</button>
+      <button type="button" data-topic="testing" aria-pressed="false">Testing &amp; deploy</button>
+      <button type="button" data-topic="js" aria-pressed="false">JavaScript</button>
+    </div>
+    <span class="count" id="q-count" aria-live="polite"></span>
+  </div>
+  <div class="qa" id="qa">
+
+    <details data-topic="express"><summary><span class="tag easy">Easy</span>What is a REST API and how is yours RESTful?</summary><div><p>Resources at URLs (<code>/api/offers</code>), HTTP verbs as actions (GET read, POST create, PATCH update, DELETE remove), JSON bodies, status codes for results, and no server-side session state (stateless JWT).</p><span class="where">backend/src/routes/</span></div></details>
+    <details data-topic="express"><summary><span class="tag easy">Easy</span>What is middleware? Name yours in order.</summary><div><p>A function <code>(req, res, next)</code> that runs before the route handler and can end the request or call <code>next()</code>. Order: <code>securityHeaders</code> → <code>express.json</code> → <code>rateLimit</code> → router → <code>authenticate</code> → <code>authorize</code> → <code>validateIdParam</code> → controller → error handler.</p><span class="where">app.js:18–55</span></div></details>
+    <details data-topic="express"><summary><span class="tag easy">Easy</span>What's the difference between 400, 401, 403, 404, 409?</summary><div><p><b>400</b> your input is invalid · <b>401</b> we don't know who you are (no/bad token) · <b>403</b> we know who you are but you're not allowed · <b>404</b> doesn't exist · <b>409</b> valid request that conflicts with current state (not enough portions, already reserved). Also 413 body too large, 429 too many requests.</p></div></details>
+    <details data-topic="express"><summary><span class="tag hard">Hard</span>Walk me through what happens when a recipient clicks "Reserve food".</summary><div><p>1. <code>OfferDetailPage.reserve</code> (53) → <code>api.post('/offers/5/reservations', {quantity: 2})</code> with the Bearer token. 2. Express: headers → JSON parse → rate limit. 3. <code>authenticate</code> verifies JWT, loads user. 4. <code>authorize('recipient')</code>. 5. <code>validateIdParam</code> checks <code>5</code>. 6. <code>createReservation</code>: validate quantity → transaction → lock offer row → checks → INSERT with random code → decrement portions → COMMIT. 7. <b>201</b> JSON → React stores the reservation in state and shows the code.</p><span class="where">OfferDetailPage.jsx:53 → reservations.js:20</span></div></details>
+    <details data-topic="express"><summary><span class="tag hard">Hard</span>How do errors thrown inside async controllers reach your error handler?</summary><div><p>Express 5 automatically catches rejected promises from async handlers and forwards them to the error middleware (Express 4 needed try/catch or a wrapper). Our <code>httpError</code> throws an Error with a <code>status</code>; the handler at <code>app.js:55</code> turns 4xx into <code>{ error: message }</code> and everything else into a generic 500.</p></div></details>
+    <details data-topic="express"><summary><span class="tag hard">Hard</span>What does <code>router.param('id', validateIdParam)</code> do?</summary><div><p>Runs <code>validateIdParam</code> once for any route in that router with <code>:id</code>, before the handler. It rejects anything that isn't a positive integer within PostgreSQL's INTEGER range → 400. So controllers can trust <code>req.params.id</code>.</p><span class="where">utils/validation.js:32 · routes/offers.js:12</span></div></details>
+    <details data-topic="express"><summary><span class="tag hard">Hard</span>Why is <code>/mine</code> declared before <code>/:id</code>?</summary><div><p>Express matches routes in order. If <code>/:id</code> came first, <code>/mine</code> would be treated as id "mine" (and rejected by the id check). Also, <code>listOffers</code> uses <code>req.path === '/mine'</code> to switch to "my offers".</p><span class="where">routes/offers.js:15–18</span></div></details>
+    <details data-topic="express"><summary><span class="tag easy">Easy</span>How does the frontend reach the backend during development? Do you need CORS?</summary><div><p>Vite's dev server proxies <code>/api</code> from :5173 to :5001 (<code>vite.config.js</code>). The browser only ever talks to one origin, so no CORS. In production Express serves both, same origin again.</p></div></details>
+
+    <details data-topic="db"><summary><span class="tag easy">Easy</span>Why PostgreSQL?</summary><div><p>Relational data with foreign keys, CHECK constraints, unique indexes and ACID transactions with row locking, all needed for safe reservations.</p></div></details>
+    <details data-topic="db"><summary><span class="tag hard">Hard</span>How do you prevent two people from reserving the last portion?</summary><div><p>A transaction with <code>SELECT … FOR UPDATE</code> on the offer row. The second request blocks until the first commits, then reads the updated <code>remaining_quantity</code> and gets 409. A CHECK constraint keeps <code>remaining_quantity ≥ 0</code> as a backup.</p><span class="where">reservations.js:20 · db.js:23</span></div></details>
+    <details data-topic="db"><summary><span class="tag hard">Hard</span>What is a deadlock and how do you avoid it?</summary><div><p>Two transactions each holding a lock the other needs. We always lock the <b>offer first, then the reservation</b>, in every function (<code>changeOffer</code>, <code>changeReservation</code>, <code>createReservation</code>), so they can't wait on each other in a cycle.</p><span class="where">reservations.js:82</span></div></details>
+    <details data-topic="db"><summary><span class="tag easy">Easy</span>What is a transaction?</summary><div><p>A group of queries that all succeed (COMMIT) or all get undone (ROLLBACK). Reserving = insert reservation + decrease portions: both or neither.</p><span class="where">config/db.js:23 withTransaction</span></div></details>
+    <details data-topic="db"><summary><span class="tag easy">Easy</span>What is a foreign key? Give an example.</summary><div><p>A column that must match a row in another table. <code>offers.donor_id REFERENCES users(id)</code>: an offer can't point to a user that doesn't exist, and the user can't be deleted while offers point to them.</p></div></details>
+    <details data-topic="db"><summary><span class="tag hard">Hard</span>What does the partial unique index on reservations do?</summary><div><p><code>UNIQUE (offer_id, recipient_id) WHERE status = 'reserved'</code>: at most one pending reservation per person per offer, but you can reserve again after cancelling. The API checks too; the index guarantees it even under races.</p></div></details>
+    <details data-topic="db"><summary><span class="tag easy">Easy</span>What are migrations and the seed?</summary><div><p>Migrations: ordered SQL files applied once and recorded in <code>schema_migrations</code>. Seed: script that creates demo accounts and offers from <code>.env</code>.</p><span class="where">db/migrate.js · db/seed.js</span></div></details>
+    <details data-topic="db"><summary><span class="tag hard">Hard</span>Why store area and category in lowercase?</summary><div><p>So filters match regardless of case ("Bakery" = "bakery"), and the index works with a simple equality. The API lowercases (<code>cleanOfferData</code>); the DB CHECK rejects non-lowercase values.</p></div></details>
+    <details data-topic="db"><summary><span class="tag hard">Hard</span>How do you mark reservations "expired" without a background job?</summary><div><p>It's computed when reading: <code>CASE WHEN r.status = 'reserved' AND o.pickup_deadline &lt;= now() THEN 'expired' ELSE r.status END</code>. Writes also check the deadline (can't cancel/confirm late). No cron job needed.</p><span class="where">reservations.js:55</span></div></details>
+    <details data-topic="db"><summary><span class="tag hard">Hard</span>What's the downside of LIMIT/OFFSET pagination?</summary><div><p>Large offsets get slower and rows can shift between pages if new items arrive. Fine at our size; keyset pagination (<code>WHERE created_at &lt; last_seen</code>) scales better.</p></div></details>
+
+    <details data-topic="auth"><summary><span class="tag easy">Easy</span>How are passwords stored?</summary><div><p>As bcrypt hashes with cost 12 (bcrypt adds a random salt automatically). We never store or log the plain password. Login uses <code>bcrypt.compare</code>.</p><span class="where">controllers/auth.js:11, 34, 67</span></div></details>
+    <details data-topic="auth"><summary><span class="tag hard">Hard</span>Why bcrypt and not SHA-256?</summary><div><p>SHA-256 is designed to be fast: billions of guesses per second on a GPU. bcrypt is deliberately slow and tunable (cost factor), and salted so identical passwords have different hashes and rainbow tables don't work. It reads only 72 bytes, which is why we cap passwords at 72 bytes.</p></div></details>
+    <details data-topic="auth"><summary><span class="tag easy">Easy</span>What's inside your JWT?</summary><div><p>Header (alg HS256), payload with <code>sub</code> (user id), <code>iat</code> and <code>exp</code> (1 hour), and a signature. No password, no role. Anyone can <i>read</i> a JWT (base64), but can't <i>change</i> it without the secret.</p><span class="where">controllers/auth.js:24</span></div></details>
+    <details data-topic="auth"><summary><span class="tag hard">Hard</span>Why load the user from the DB on every request instead of trusting the token?</summary><div><p>Role changes and deleted accounts take effect immediately, and the token carries nothing worth tampering with. Cost: one indexed primary-key query per request.</p><span class="where">middleware/auth.js:11</span></div></details>
+    <details data-topic="auth"><summary><span class="tag hard">Hard</span>Where is the token stored in the browser and why?</summary><div><p><code>sessionStorage</code>: survives refresh, cleared when the tab closes. localStorage would persist forever (bigger risk). An httpOnly cookie hides it from JS but needs CSRF protection. We chose the header approach for simplicity and CSRF immunity, and defend against XSS with React + CSP.</p><span class="where">services/api.js:8, 30</span></div></details>
+    <details data-topic="auth"><summary><span class="tag easy">Easy</span>What happens when the token expires?</summary><div><p>The next API call returns 401. <code>api.js</code> clears the token and fires <code>shareaplate:session-expired</code>; <code>AuthContext</code> signs out and shows "Your session expired".</p><span class="where">api.js:71 · AuthContext.jsx:35</span></div></details>
+    <details data-topic="auth"><summary><span class="tag hard">Hard</span>If I edit the role in sessionStorage to "administrator", what happens?</summary><div><p>The admin <i>page</i> might render (frontend guard reads local state), but every admin API call returns <b>403</b> because the server reads the real role from the database. No data is exposed.</p></div></details>
+
+    <details data-topic="react"><summary><span class="tag easy">Easy</span>How does client-side routing work?</summary><div><p>React Router's <code>&lt;BrowserRouter&gt;</code> (main.jsx) watches the URL; <code>&lt;Routes&gt;</code> in App.jsx picks which page component to render, without reloading. <code>&lt;Link&gt;</code> and <code>navigate()</code> change the URL.</p><span class="where">main.jsx · app/App.jsx:42</span></div></details>
+    <details data-topic="react"><summary><span class="tag easy">Easy</span>What is React Context and why use it?</summary><div><p>A way to share values without passing props through every level. <code>AuthProvider</code> wraps the app; any page calls <code>useAuth()</code> to get <code>user</code>, <code>login</code>, <code>logout</code>.</p><span class="where">context/AuthContext.jsx:21 · hooks/useAuth.js</span></div></details>
+    <details data-topic="react"><summary><span class="tag hard">Hard</span>Why <code>useCallback</code> and <code>useMemo</code> in AuthContext?</summary><div><p>They keep the same function/object between renders. Without <code>useMemo</code>, the context value would be a new object every render and every consumer would re-render. <code>useCallback</code> keeps <code>login</code> etc. stable so they can be safe dependencies.</p></div></details>
+    <details data-topic="react"><summary><span class="tag hard">Hard</span>Explain the <code>useEffect</code> + <code>AbortController</code> in OffersPage.</summary><div><p>The effect runs when <code>applied</code> filters or <code>page</code> change. It starts a fetch with an abort signal and returns a cleanup that aborts it. If the user changes filters quickly, the stale request is cancelled and can't overwrite newer results; we ignore <code>AbortError</code>.</p><span class="where">pages/OffersPage.jsx:30</span></div></details>
+    <details data-topic="react"><summary><span class="tag easy">Easy</span>What is a controlled input?</summary><div><p>An input whose <code>value</code> comes from React state and updates via <code>onChange</code>. Our forms keep one state object and update by <code>event.target.name</code>.</p><span class="where">LoginPage.jsx:30 update · OfferForm.jsx:19</span></div></details>
+    <details data-topic="react"><summary><span class="tag hard">Hard</span>Why <code>key={offerId}</code> in OfferDetailRoute?</summary><div><p>Changing a component's key makes React unmount and remount it, which resets all its state (form, messages, reservation) when you navigate from one offer to another.</p><span class="where">OfferDetailPage.jsx:290</span></div></details>
+    <details data-topic="react"><summary><span class="tag easy">Easy</span>Why a <code>key</code> prop in lists?</summary><div><p>So React can match items between renders and update only what changed. We use the database id (<code>key={offer.id}</code>), never the array index.</p></div></details>
+    <details data-topic="react"><summary><span class="tag easy">Easy</span>How is the Button component reusable?</summary><div><p>It renders a router <code>Link</code> if given <code>to</code>, an <code>&lt;a&gt;</code> if given <code>href</code>, otherwise a <code>&lt;button&gt;</code>, with the same styles via <code>variant</code>.</p><span class="where">components/ui/Button.jsx</span></div></details>
+    <details data-topic="react"><summary><span class="tag hard">Hard</span>Why do dates go through <code>fromDateTimeLocal</code>?</summary><div><p><code>&lt;input type="datetime-local"&gt;</code> gives local time without a timezone ("2026-11-19T18:30"). The API requires ISO with timezone so the server stores the exact instant (<code>TIMESTAMPTZ</code>). <code>new Date(value).toISOString()</code> converts to UTC.</p><span class="where">utils/format.js · OfferForm.jsx:24</span></div></details>
+    <details data-topic="react"><summary><span class="tag easy">Easy</span>What is Vite?</summary><div><p>The build tool: fast dev server with hot reload and a proxy; <code>vite build</code> bundles and minifies React into <code>frontend/dist</code>.</p></div></details>
+
+    <details data-topic="security"><summary><span class="tag easy">Easy</span>How do you prevent SQL injection?</summary><div><p>Parameterised queries: <code>pool.query('… WHERE id = $1', [id])</code>. The value is sent separately and is never parsed as SQL.</p></div></details>
+    <details data-topic="security"><summary><span class="tag easy">Easy</span>How do you prevent XSS?</summary><div><p>React escapes everything in <code>{}</code>; we never use <code>dangerouslySetInnerHTML</code>; CSP blocks outside and inline scripts. A frontend test proves HTML in a title renders as text.</p></div></details>
+    <details data-topic="security"><summary><span class="tag hard">Hard</span>What is CSRF and why aren't you vulnerable?</summary><div><p>CSRF tricks a logged-in browser into sending a request to our site, relying on cookies being attached automatically. We authenticate with an <code>Authorization</code> header that only our JavaScript adds, so a forged request from another site arrives unauthenticated → 401.</p></div></details>
+    <details data-topic="security"><summary><span class="tag hard">Hard</span>What is IDOR and where do you check for it?</summary><div><p>Insecure Direct Object Reference: changing an id to access someone else's data. <code>changeOffer</code> (owner or admin), <code>listReservations</code> (offer owner), <code>cancelReservation</code> (recipient), <code>confirmPickup</code> (donor of the offer).</p></div></details>
+    <details data-topic="security"><summary><span class="tag hard">Hard</span>What does your Content-Security-Policy say?</summary><div><p><code>default-src 'self'</code> (scripts, styles, fonts, fetch only from our origin), <code>img-src 'self' data:</code>, <code>object-src 'none'</code>, <code>base-uri 'self'</code>, <code>frame-ancestors 'none'</code>, <code>form-action 'self'</code>. That's why fonts are bundled instead of loaded from Google.</p><span class="where">middleware/security.js:4</span></div></details>
+    <details data-topic="security"><summary><span class="tag hard">Hard</span>How does your rate limiter work and what are its weaknesses?</summary><div><p>Fixed window per IP stored in a <code>Map</code>: count requests until <code>resetAt</code>, then 429 with Retry-After. Weaknesses: memory-only (resets on restart, doesn't share across servers), per-IP (botnets, shared Wi-Fi). Production fix: Redis-backed store + per-account limits.</p><span class="where">security.js:25</span></div></details>
+    <details data-topic="security"><summary><span class="tag hard">Hard</span>What's <code>trust proxy</code> for?</summary><div><p>Behind a hosting proxy, every request seems to come from the proxy's IP. With <code>TRUST_PROXY=1</code>, Express uses the <code>X-Forwarded-For</code> header for <code>req.ip</code> and <code>req.secure</code>, so rate limiting and HSTS work correctly. Only enabled when we know a proxy is there, because the header can be faked otherwise.</p><span class="where">app.js:16</span></div></details>
+    <details data-topic="security"><summary><span class="tag easy">Easy</span>Where are secrets kept?</summary><div><p>In <code>backend/.env</code> locally (git-ignored) and in the host's environment variables in production. <code>.env.example</code> only has placeholders. The server refuses to start with a missing/short <code>JWT_SECRET</code>.</p></div></details>
+
+    <details data-topic="testing"><summary><span class="tag easy">Easy</span>What tests do you have and how do you run them?</summary><div><p><code>npm test</code>. Backend (Node test runner): 13 tests of real HTTP requests for auth and security. Frontend (Vitest + Testing Library): 6 tests for components, XSS and routing.</p></div></details>
+    <details data-topic="testing"><summary><span class="tag hard">Hard</span>Why don't your backend tests need a database?</summary><div><p>They test the layers before the database: token checks, validation, body parsing, headers, rate limiting all reject requests before any query runs. The pool is created but never connects. The full flow (with DB) we checked with an end-to-end script; integration tests with a test database would be the next step.</p></div></details>
+    <details data-topic="testing"><summary><span class="tag hard">Hard</span>How is the app deployed?</summary><div><p><code>npm run build</code> installs and builds React; <code>npm run start:prod</code> runs migrations and starts Express, which serves <code>frontend/dist</code> plus <code>/api</code>. Hosted PostgreSQL via <code>DATABASE_URL</code> with SSL. Secrets are env vars on the host.</p><span class="where">docs/DEPLOYMENT.md · app.js:42</span></div></details>
+
+    <details data-topic="js"><summary><span class="tag easy">Easy</span>What do <code>async</code>/<code>await</code> do?</summary><div><p><code>async</code> functions return a Promise; <code>await</code> pauses that function until a Promise settles, without blocking the server. Errors become exceptions you can catch.</p></div></details>
+    <details data-topic="js"><summary><span class="tag easy">Easy</span>What does <code>...</code> do in <code>{ ...current, [name]: value }</code>?</summary><div><p>Spread copies all properties of <code>current</code> into a new object; <code>[name]</code> is a computed key that overwrites one field. We create a new object instead of mutating state so React notices the change.</p></div></details>
+    <details data-topic="js"><summary><span class="tag easy">Easy</span>What does <code>?.</code> and <code>??</code> mean?</summary><div><p>Optional chaining <code>a?.b</code> returns undefined instead of crashing if <code>a</code> is null. Nullish coalescing <code>x ?? y</code> uses <code>y</code> only if <code>x</code> is null/undefined (unlike <code>||</code>, which also replaces 0 and '').</p></div></details>
+    <details data-topic="js"><summary><span class="tag hard">Hard</span>Why <code>crypto.randomInt</code> instead of <code>Math.random</code>?</summary><div><p><code>Math.random</code> isn't cryptographically secure, so its outputs can be predicted. <code>crypto.randomInt</code> uses the OS's secure random source, so pickup codes can't be guessed from previous ones.</p></div></details>
+  </div>
+</section>
+
+<!-- 14. GLOSSARY -->
+<section id="glossary" aria-labelledby="g-title">
+  <p class="eyebrow">Cheat sheet</p>
+  <h2 id="g-title">Glossary</h2>
+  <dl class="glossary">
+    <dt>API / REST</dt><dd>The URLs the website can call; REST = resources + HTTP verbs + JSON + status codes.</dd>
+    <dt>Middleware</dt><dd>Function that runs before a route and can stop the request.</dd>
+    <dt>Controller</dt><dd>The function that does the work for one URL.</dd>
+    <dt>JWT</dt><dd>Signed token proving who you are; expires in 1 hour.</dd>
+    <dt>bcrypt</dt><dd>Slow, salted password hashing.</dd>
+    <dt>Transaction</dt><dd>Queries that all commit or all roll back.</dd>
+    <dt>FOR UPDATE</dt><dd>Row lock: others wait until we commit.</dd>
+    <dt>Migration / Seed</dt><dd>SQL that creates tables / script that adds demo data.</dd>
+    <dt>Soft delete</dt><dd>Mark as removed instead of deleting, to keep history.</dd>
+    <dt>CSP</dt><dd>Header telling the browser which sources it may load.</dd>
+    <dt>IDOR</dt><dd>Accessing someone else's data by changing an id.</dd>
+    <dt>CSRF</dt><dd>Another site making your browser send a request with your cookies.</dd>
+    <dt>XSS</dt><dd>Injecting a script into a page other users see.</dd>
+    <dt>Rate limiting</dt><dd>Max requests per visitor per time window.</dd>
+    <dt>Context (React)</dt><dd>Shared state any component can read with a hook.</dd>
+    <dt>Proxy (Vite)</dt><dd>Dev server forwards /api calls to the backend.</dd>
+  </dl>
+</section>
+
 </main>
+</div>
 
 <script>
 (function () {
-  // Demo checklist: remembers ticks in this browser only.
-  var KEY = 'shareaplate-demo-steps-v2';
+  // Morning checklist: ticks are remembered in this browser only.
+  var KEY = 'shareaplate-handbook-checklist';
   var boxes = Array.prototype.slice.call(document.querySelectorAll('.steps input'));
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
@@ -368,21 +832,33 @@ COMMIT                                             -- or ROLLBACK if anything fa
       try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
     });
   });
-  document.getElementById('reset-steps').addEventListener('click', function () {
-    saved = {};
-    boxes.forEach(function (box) { box.checked = false; });
-    try { localStorage.removeItem(KEY); } catch (e) {}
-  });
 
-  // Easy / Hard filter for the professor questions.
-  var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
-  var items = Array.prototype.slice.call(document.querySelectorAll('[data-qa] details'));
-  buttons.forEach(function (button) {
-    button.addEventListener('click', function () {
-      var level = button.getAttribute('data-filter');
-      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b === button)); });
-      items.forEach(function (item) { item.hidden = level !== 'all' && item.getAttribute('data-level') !== level; });
+  // Question search + topic filter.
+  var items = Array.prototype.slice.call(document.querySelectorAll('#qa details'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('[data-topic]')).filter(function (el) { return el.tagName === 'BUTTON'; });
+  var search = document.getElementById('q-search');
+  var count = document.getElementById('q-count');
+  var topic = 'all';
+  function apply() {
+    var q = search.value.trim().toLowerCase();
+    var shown = 0;
+    items.forEach(function (item) {
+      var okTopic = topic === 'all' || item.getAttribute('data-topic') === topic;
+      var okText = !q || item.textContent.toLowerCase().indexOf(q) !== -1;
+      item.hidden = !(okTopic && okText);
+      if (!item.hidden) shown++;
+      if (q && !item.hidden) item.open = true;
+    });
+    count.textContent = shown + ' of ' + items.length + ' questions';
+  }
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      topic = chip.getAttribute('data-topic');
+      chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+      apply();
     });
   });
+  search.addEventListener('input', apply);
+  apply();
 })();
 </script>

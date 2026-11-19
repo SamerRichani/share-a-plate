@@ -33,13 +33,23 @@ const running = parts.map(({ name, folder, color }) => {
   child.stderr.on('data', print);
   child.on('exit', (code) => {
     console.log(`${label}stopped${code ? ` (exit code ${code})` : ''}`);
+    // If one part stops, stop the other too, so nothing is left half-running.
+    stopAll(code || 0);
   });
   return child;
 });
 
+let stopping = false;
+function stopAll(exitCode) {
+  if (stopping) return;
+  stopping = true;
+  running.forEach((child) => child.kill('SIGINT'));
+  if (exitCode) {
+    console.log('\nShareAPlate stopped because of the error above. Fix it, then run `npm start` again.');
+  }
+  setTimeout(() => process.exit(exitCode), 500);
+}
+
 console.log('\nShareAPlate is starting... open http://localhost:5173 in your browser.\n');
 
-process.on('SIGINT', () => {
-  running.forEach((child) => child.kill('SIGINT'));
-  process.exit(0);
-});
+process.on('SIGINT', () => stopAll(0));

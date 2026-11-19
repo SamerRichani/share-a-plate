@@ -11,7 +11,9 @@ async function startServer() {
     await pool.query('SELECT 1');
     console.log('PostgreSQL connected.');
 
-    const server = app.listen(port, () => {
+    const server = app.listen(port, (error) => {
+      // Express 5 calls this with an error if the port can't be used.
+      if (error) return;
       console.log(`ShareAPlate API running at http://localhost:${server.address().port}`);
     });
 
@@ -28,7 +30,11 @@ async function startServer() {
     process.once('SIGTERM', shutdown);
 
     server.on('error', (error) => {
-      console.error('Server failed:', error.message);
+      if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use. Is ShareAPlate already running in another terminal? Stop it (Ctrl+C) and try again.`);
+      } else {
+        console.error('Server failed:', error.message);
+      }
       process.exitCode = 1;
       shutdown();
     });
