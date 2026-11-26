@@ -6,6 +6,8 @@ Restaurants, bakeries and shops often have food left over at the end of the day.
 
 *Capstone project by Samer Richani, Alfred Haber and Ziad Boutros.*
 
+**🌐 Live demo:** https://famed-blue-wallaby-04.hostingersite.com — sign-in details in [Live deployment](#live-deployment).
+
 ---
 
 ## Features
@@ -127,7 +129,23 @@ npm test
 
 ## Deployment
 
-The backend also serves the built website, so the whole app deploys as **one web service + one PostgreSQL database**. Step-by-step: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+The backend can also serve the built website, so the whole app can deploy as **one web service + one PostgreSQL database**. Step-by-step: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+### Live deployment
+
+| Part | Where it runs | URL |
+| --- | --- | --- |
+| Website (frontend, static site) | Hostinger | https://famed-blue-wallaby-04.hostingersite.com |
+| Server (backend API, Node.js) | Hostinger | https://tremendous-darkseagreen-turtle-62.hostingersite.com |
+| Database (PostgreSQL) | Neon | Holds the tables, 3 accounts and 5 demo offers |
+
+**Accounts on the live site:**
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@shareaplate.test` | `IVOhHEljdRgmhurCwTTJmGvh` |
+| Donor | `donor@shareaplate.test` | `tzo3r5QxN45dloCuUzhWD7cv` |
+| Recipient | `recipient@shareaplate.test` | `DIj5UBuYhSXFUkZqr3rBSqLG` |
 
 ## What we'd build next
 
