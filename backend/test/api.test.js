@@ -15,6 +15,12 @@ const post = (path, body, headers = {}) => fetch(server.baseUrl + path, {
   body: typeof body === 'string' ? body : JSON.stringify(body),
 });
 
+test('the health test route answers without a login', async () => {
+  const res = await fetch(`${server.baseUrl}/api/health`);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { status: 'ok' });
+});
+
 test('protected routes need a login token', async () => {
   const res = await fetch(`${server.baseUrl}/api/offers`);
   assert.equal(res.status, 401);

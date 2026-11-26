@@ -56,12 +56,13 @@ request → security headers → rate limit → route → authenticate → autho
 | `backend/src/utils/` | Input checking helpers and the error helper |
 | `backend/db/` | Database tables (`migrations/`) and demo data (`seed.js`) |
 
-**Database tables:** `users` (with role), `offers`, `reservations` (with pickup code), `reports`. See [backend/db/SCHEMA.md](backend/db/SCHEMA.md).
+**Database tables:** `users` (with role), `offers`, `reservations` (with pickup code), `reports`. See [backend/db/SCHEMA.md](backend/db/SCHEMA.md). Main screens: [docs/WIREFRAMES.md](docs/WIREFRAMES.md).
 
 ### API at a glance
 
 | Method & URL | Who |
 | --- | --- |
+| `GET /api/health` (test route) | Anyone |
 | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` | Anyone / signed in |
 | `GET /api/offers`, `GET /api/offers/:id` | Signed in |
 | `GET /api/offers/mine`, `POST /api/offers`, `PATCH /api/offers/:id`, `DELETE /api/offers/:id` | Donor (own offers) |
@@ -124,7 +125,7 @@ On the sign-in page, the demo buttons fill these in. They only appear when runni
 npm test
 ```
 
-- **Backend (13 tests)** in `backend/test/`: rejects missing/forged/unsigned tokens, blocks admin sign-up, refuses bad JSON and huge bodies, checks security headers and the sign-in rate limit, and unit-tests the input checks.
+- **Backend (14 tests)** in `backend/test/`: rejects missing/forged/unsigned tokens, blocks admin sign-up, refuses bad JSON and huge bodies, checks security headers and the sign-in rate limit, and unit-tests the input checks.
 - **Frontend (6 tests)** in `frontend/src/tests/`: offer card display, user-typed HTML shown as plain text (XSS), sign-in redirect for protected pages, date formatting.
 
 ## Deployment
@@ -136,7 +137,7 @@ The backend can also serve the built website, so the whole app can deploy as **o
 | Part | Where it runs | URL |
 | --- | --- | --- |
 | Website (frontend, static site) | Hostinger | https://famed-blue-wallaby-04.hostingersite.com |
-| Server (backend API, Node.js) | Hostinger | https://tremendous-darkseagreen-turtle-62.hostingersite.com |
+| Server (backend API, Node.js) | Hostinger | https://tremendous-darkseagreen-turtle-62.hostingersite.com (test route: [`/api/health`](https://tremendous-darkseagreen-turtle-62.hostingersite.com/api/health)) |
 | Database (PostgreSQL) | Neon | Holds the tables, 3 accounts and 5 demo offers |
 
 **Accounts on the live site:**

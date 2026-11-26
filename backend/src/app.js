@@ -29,6 +29,9 @@ app.use('/api', apiLimit);
 app.use('/api/auth/login', loginLimit);
 app.use('/api/auth/register', loginLimit);
 
+// Test route: open /api/health to check the server is up (no login needed).
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
 // The API routes. Each file lists the URLs for one part of the app.
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/offers', require('./routes/offers'));
